@@ -1,5 +1,5 @@
 var vm = require('vm');
-var EventEmitter = require('events');
+var events = require('events');
 
 function SecureWorker(scriptKey) {
   var self = this;
@@ -8,8 +8,8 @@ function SecureWorker(scriptKey) {
     return new SecureWorker.apply(null, arguments);
   }
 
-  self._eventsFromOutside = new EventEmitter();
-  self._eventsFromInside = new EventEmitter();
+  self._eventsFromOutside = new events.EventEmitter();
+  self._eventsFromInside = new events.EventEmitter();
 
   var code = this.constructor._resolveScriptKey(scriptKey);
   var sandbox = this.constructor._sandboxContext(self);
