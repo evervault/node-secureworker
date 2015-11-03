@@ -1,6 +1,6 @@
 var SecureWorker = require('./index');
 
-SecureWorker._appSecret = function () {
+SecureWorker._appSecret = function _appSecret() {
   return 'foobar';
 };
 
@@ -10,7 +10,7 @@ function worker() {
   });
 }
 
-SecureWorker._resolveScriptKey = function (scriptKey) {
+SecureWorker._resolveScriptKey = function _resolveScriptKey(scriptKey) {
   // Ignoring scriptKey.
   return '(' + worker.toString() + ')();';
 };
