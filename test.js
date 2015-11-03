@@ -1,0 +1,24 @@
+var SecureWorker = require('./index');
+
+SecureWorker._appSecret = function () {
+  return 'foobar';
+};
+
+function worker() {
+  F.onMessage(function (message) {
+    F.postMessage(message + 1);
+  });
+}
+
+SecureWorker._resolveScriptKey = function (scriptKey) {
+  // Ignoring scriptKey.
+  return '(' + worker.toString() + ')();';
+};
+
+var secureWorker = new SecureWorker('foobar');
+
+secureWorker.onMessage(function (message) {
+  console.log("message", message);
+});
+
+secureWorker.postMessage(4);
