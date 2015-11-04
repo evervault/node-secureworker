@@ -1,7 +1,7 @@
 var vm = require('vm');
 var events = require('events');
 
-var SecureWorker = function SecureWorker(scriptKey) {
+var SecureWorker = function SecureWorker(contentKey) {
   var self = this;
 
   if (!(self instanceof SecureWorker)) {
@@ -11,11 +11,11 @@ var SecureWorker = function SecureWorker(scriptKey) {
   self._eventsFromOutside = new events.EventEmitter();
   self._eventsFromInside = new events.EventEmitter();
 
-  var code = this.constructor._resolveScriptKey(scriptKey);
+  var code = this.constructor._resolveContentKey(contentKey);
   var sandbox = this.constructor._sandboxContext(self);
 
   vm.runInNewContext(code, sandbox, {
-    filename: scriptKey,
+    filename: contentKey,
     displayErrors: true
   });
 
@@ -53,7 +53,7 @@ SecureWorker.prototype.terminate = function terminate() {
 };
 
 // Class method for this mock implementation which should be overridden by the user of the package.
-SecureWorker._resolveScriptKey = function _resolveScriptKey() {
+SecureWorker._resolveContentKey = function _resolveContentKey() {
   throw new Error("Not implemented.");
 };
 

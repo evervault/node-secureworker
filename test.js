@@ -10,7 +10,7 @@ function worker() {
   });
 }
 
-SecureWorker._resolveScriptKey = function _resolveScriptKey(scriptKey) {
+SecureWorker._resolveContentKey = function _resolveContentKey(scriptKey) {
   // Ignoring scriptKey.
   return '(' + worker.toString() + ')();';
 };
