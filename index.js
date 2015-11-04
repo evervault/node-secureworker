@@ -1,7 +1,7 @@
 var vm = require('vm');
 var events = require('events');
 
-function SecureWorker(scriptKey) {
+var SecureWorker = function SecureWorker(scriptKey) {
   var self = this;
 
   if (!(self instanceof SecureWorker)) {
@@ -20,7 +20,7 @@ function SecureWorker(scriptKey) {
   });
 
   return self;
-}
+};
 
 SecureWorker.prototype.onMessage = function onMessage(listener) {
   var self = this;
@@ -60,7 +60,7 @@ SecureWorker._resolveScriptKey = function _resolveScriptKey() {
 // Class method for this mock implementation to allow specifying sandbox context.
 SecureWorker._sandboxContext = function _sandboxContext(secureWorker) {
   return {
-    // Our internal API.
+    // Our internal trusted API.
     F: {
       onMessage: function onMessage(listener) {
         secureWorker._eventsFromOutside.addListener('message', listener);
