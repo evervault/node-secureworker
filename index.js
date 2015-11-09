@@ -59,7 +59,7 @@ SecureWorker._resolveContentKey = function _resolveContentKey() {
 
 // Class method for this mock implementation to allow specifying sandbox context.
 SecureWorker._sandboxContext = function _sandboxContext(secureWorker) {
-  return {
+  var sandbox = {
     // Our internal trusted API.
     F: {
       onMessage: function onMessage(listener) {
@@ -84,6 +84,8 @@ SecureWorker._sandboxContext = function _sandboxContext(secureWorker) {
       }
     }
   };
+  sandbox.self = sandbox;
+  return sandbox;
 };
 
 SecureWorker._appSecret = function _appSecret() {
