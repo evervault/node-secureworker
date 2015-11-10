@@ -14,7 +14,9 @@ var SecureWorker = function SecureWorker(contentKey) {
   var code = this.constructor._resolveContentKey(contentKey);
   var sandbox = this.constructor._sandboxContext(self);
 
-  vm.runInNewContext(code, sandbox, {
+  self._context = vm.createContext(sandbox);
+
+  vm.runInContext(code, self._context, {
     filename: contentKey,
     displayErrors: true
   });
@@ -81,6 +83,17 @@ SecureWorker._sandboxContext = function _sandboxContext(secureWorker) {
       },
       getAppSecret: function getAppSecret() {
         return secureWorker.constructor._appSecret();
+      },
+      importScripts: function importScripts(/* args */) {
+        for (var i = 0; i < arguments.length; i++) {
+          var contentKey = arguments[i];
+          var code = SecureWorker._resolveContentKey(contentKey);
+
+          vm.runInContext(code, secureWorker._context, {
+            filename: contentKey,
+            displayErrors: true
+          });
+        }
       }
     }
   };
