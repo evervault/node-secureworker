@@ -1,5 +1,6 @@
 var vm = require('vm');
 var events = require('events');
+var Promise = require('polyfill-promise');
 
 var SecureWorker = function SecureWorker(contentKey) {
   var self = this;

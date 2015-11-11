@@ -4,5 +4,8 @@
   "engines": {
     "node": ">=0.10.33"
   },
+  "dependencies": {
+    "polyfill-promise": ">=4.0.1"
+  },
   "main": "./index.js"
 }
