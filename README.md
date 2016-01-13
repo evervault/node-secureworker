@@ -7,6 +7,7 @@ TODO:
 
 ## Important configuration
 - SGX include dirs, `/NODEFAULTLIB` - Compile for SGX platform.
+- Working Directory set to `$(OutDir)` - The enclave dll is there.
 - `DUK_OPT_NO_FILE_IO` - File I/O is not available in enclave.
 - `DUK_OPT_CPP_EXCEPTIONS` - The SGX SDK doesn't support `setjmp`.
 - `DUK_OPT_NO_JX` - The SGX SDK doesn't support `sscanf`, which JX needs.
