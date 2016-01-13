@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Prerelease|Win32">
+      <Configuration>Prerelease</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Simulation|Win32">
+      <Configuration>Simulation</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src-separate\duk_bi_date_sgx.c" />
+    <ClCompile Include="src-separate\duk_alloc_default.c" />
+    <ClCompile Include="src-separate\duk_api_buffer.c" />
+    <ClCompile Include="src-separate\duk_api_bytecode.c" />
+    <ClCompile Include="src-separate\duk_api_call.c" />
+    <ClCompile Include="src-separate\duk_api_codec.c" />
+    <ClCompile Include="src-separate\duk_api_compile.c" />
+    <ClCompile Include="src-separate\duk_api_debug.c" />
+    <ClCompile Include="src-separate\duk_api_heap.c" />
+    <ClCompile Include="src-separate\duk_api_logging.c" />
+    <ClCompile Include="src-separate\duk_api_memory.c" />
+    <ClCompile Include="src-separate\duk_api_object.c" />
+    <ClCompile Include="src-separate\duk_api_stack.c" />
+    <ClCompile Include="src-separate\duk_api_string.c" />
+    <ClCompile Include="src-separate\duk_api_var.c" />
+    <ClCompile Include="src-separate\duk_bi_array.c" />
+    <ClCompile Include="src-separate\duk_bi_boolean.c" />
+    <ClCompile Include="src-separate\duk_bi_buffer.c" />
+    <ClCompile Include="src-separate\duk_bi_date.c" />
+    <ClCompile Include="src-separate\duk_bi_date_unix.c" />
+    <ClCompile Include="src-separate\duk_bi_date_windows.c" />
+    <ClCompile Include="src-separate\duk_bi_duktape.c" />
+    <ClCompile Include="src-separate\duk_bi_error.c" />
+    <ClCompile Include="src-separate\duk_bi_function.c" />
+    <ClCompile Include="src-separate\duk_bi_global.c" />
+    <ClCompile Include="src-separate\duk_bi_json.c" />
+    <ClCompile Include="src-separate\duk_bi_logger.c" />
+    <ClCompile Include="src-separate\duk_bi_math.c" />
+    <ClCompile Include="src-separate\duk_bi_number.c" />
+    <ClCompile Include="src-separate\duk_bi_object.c" />
+    <ClCompile Include="src-separate\duk_bi_pointer.c" />
+    <ClCompile Include="src-separate\duk_bi_proxy.c" />
+    <ClCompile Include="src-separate\duk_bi_regexp.c" />
+    <ClCompile Include="src-separate\duk_bi_string.c" />
+    <ClCompile Include="src-separate\duk_bi_thread.c" />
+    <ClCompile Include="src-separate\duk_bi_thrower.c" />
+    <ClCompile Include="src-separate\duk_builtins.c" />
+    <ClCompile Include="src-separate\duk_debugger.c" />
+    <ClCompile Include="src-separate\duk_debug_fixedbuffer.c" />
+    <ClCompile Include="src-separate\duk_debug_heap.c" />
+    <ClCompile Include="src-separate\duk_debug_macros.c" />
+    <ClCompile Include="src-separate\duk_debug_vsnprintf.c" />
+    <ClCompile Include="src-separate\duk_error_augment.c" />
+    <ClCompile Include="src-separate\duk_error_longjmp.c" />
+    <ClCompile Include="src-separate\duk_error_macros.c" />
+    <ClCompile Include="src-separate\duk_error_misc.c" />
+    <ClCompile Include="src-separate\duk_error_throw.c" />
+    <ClCompile Include="src-separate\duk_hbufferobject_misc.c" />
+    <ClCompile Include="src-separate\duk_hbuffer_alloc.c" />
+    <ClCompile Include="src-separate\duk_hbuffer_ops.c" />
+    <ClCompile Include="src-separate\duk_heap_alloc.c" />
+    <ClCompile Include="src-separate\duk_heap_hashstring.c" />
+    <ClCompile Include="src-separate\duk_heap_markandsweep.c" />
+    <ClCompile Include="src-separate\duk_heap_memory.c" />
+    <ClCompile Include="src-separate\duk_heap_misc.c" />
+    <ClCompile Include="src-separate\duk_heap_refcount.c" />
+    <ClCompile Include="src-separate\duk_heap_stringcache.c" />
+    <ClCompile Include="src-separate\duk_heap_stringtable.c" />
+    <ClCompile Include="src-separate\duk_hobject_alloc.c" />
+    <ClCompile Include="src-separate\duk_hobject_class.c" />
+    <ClCompile Include="src-separate\duk_hobject_enum.c" />
+    <ClCompile Include="src-separate\duk_hobject_finalizer.c" />
+    <ClCompile Include="src-separate\duk_hobject_misc.c" />
+    <ClCompile Include="src-separate\duk_hobject_pc2line.c" />
+    <ClCompile Include="src-separate\duk_hobject_props.c" />
+    <ClCompile Include="src-separate\duk_hstring_misc.c" />
+    <ClCompile Include="src-separate\duk_hthread_alloc.c" />
+    <ClCompile Include="src-separate\duk_hthread_builtins.c" />
+    <ClCompile Include="src-separate\duk_hthread_misc.c" />
+    <ClCompile Include="src-separate\duk_hthread_stacks.c" />
+    <ClCompile Include="src-separate\duk_js_call.c" />
+    <ClCompile Include="src-separate\duk_js_compiler.c" />
+    <ClCompile Include="src-separate\duk_js_executor.c" />
+    <ClCompile Include="src-separate\duk_js_ops.c" />
+    <ClCompile Include="src-separate\duk_js_var.c" />
+    <ClCompile Include="src-separate\duk_lexer.c" />
+    <ClCompile Include="src-separate\duk_numconv.c" />
+    <ClCompile Include="src-separate\duk_regexp_compiler.c" />
+    <ClCompile Include="src-separate\duk_regexp_executor.c" />
+    <ClCompile Include="src-separate\duk_replacements.c" />
+    <ClCompile Include="src-separate\duk_selftest.c" />
+    <ClCompile Include="src-separate\duk_setjmp_stub.c" />
+    <ClCompile Include="src-separate\duk_strings.c" />
+    <ClCompile Include="src-separate\duk_tval.c" />
+    <ClCompile Include="src-separate\duk_unicode_support.c" />
+    <ClCompile Include="src-separate\duk_unicode_tables.c" />
+    <ClCompile Include="src-separate\duk_util_bitdecoder.c" />
+    <ClCompile Include="src-separate\duk_util_bitencoder.c" />
+    <ClCompile Include="src-separate\duk_util_bufwriter.c" />
+    <ClCompile Include="src-separate\duk_util_hashbytes.c" />
+    <ClCompile Include="src-separate\duk_util_hashprime.c" />
+    <ClCompile Include="src-separate\duk_util_misc.c" />
+    <ClCompile Include="src-separate\duk_util_tinyrandom.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src-separate\duktape.h" />
+    <ClInclude Include="src-separate\duk_api_internal.h" />
+    <ClInclude Include="src-separate\duk_bi_protos.h" />
+    <ClInclude Include="src-separate\duk_builtins.h" />
+    <ClInclude Include="src-separate\duk_config.h" />
+    <ClInclude Include="src-separate\duk_debug.h" />
+    <ClInclude Include="src-separate\duk_debugger.h" />
+    <ClInclude Include="src-separate\duk_error.h" />
+    <ClInclude Include="src-separate\duk_exception.h" />
+    <ClInclude Include="src-separate\duk_forwdecl.h" />
+    <ClInclude Include="src-separate\duk_hbuffer.h" />
+    <ClInclude Include="src-separate\duk_hbufferobject.h" />
+    <ClInclude Include="src-separate\duk_hcompiledfunction.h" />
+    <ClInclude Include="src-separate\duk_heap.h" />
+    <ClInclude Include="src-separate\duk_heaphdr.h" />
+    <ClInclude Include="src-separate\duk_hnativefunction.h" />
+    <ClInclude Include="src-separate\duk_hobject.h" />
+    <ClInclude Include="src-separate\duk_hstring.h" />
+    <ClInclude Include="src-separate\duk_hthread.h" />
+    <ClInclude Include="src-separate\duk_internal.h" />
+    <ClInclude Include="src-separate\duk_jmpbuf.h" />
+    <ClInclude Include="src-separate\duk_js.h" />
+    <ClInclude Include="src-separate\duk_json.h" />
+    <ClInclude Include="src-separate\duk_js_bytecode.h" />
+    <ClInclude Include="src-separate\duk_js_compiler.h" />
+    <ClInclude Include="src-separate\duk_lexer.h" />
+    <ClInclude Include="src-separate\duk_numconv.h" />
+    <ClInclude Include="src-separate\duk_regexp.h" />
+    <ClInclude Include="src-separate\duk_replacements.h" />
+    <ClInclude Include="src-separate\duk_selftest.h" />
+    <ClInclude Include="src-separate\duk_strings.h" />
+    <ClInclude Include="src-separate\duk_tval.h" />
+    <ClInclude Include="src-separate\duk_unicode.h" />
+    <ClInclude Include="src-separate\duk_util.h" />
+    <ClInclude Include="src-separate\duk_setjmp_stub.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FFDB79E5-4146-44EB-9A87-D04F188BB5CB}</ProjectGuid>
+    <RootNamespace>duktape</RootNamespace>
+    <ProjectName>duktape-dist</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Simulation|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Prerelease|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Simulation|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Prerelease|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SGXSDKInstallPath)include;$(SGXSDKInstallPath)include\tlibc;$(SGXSDKInstallPath)include\stlport</AdditionalIncludeDirectories>
+      <ShowIncludes>
+      </ShowIncludes>
+      <PreprocessorDefinitions>DUK_OPT_NO_FILE_IO;DUK_OPT_CPP_EXCEPTIONS;DUK_OPT_NO_JX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks />
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Simulation|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SGXSDKInstallPath)include;$(SGXSDKInstallPath)include\tlibc;$(SGXSDKInstallPath)include\stlport</AdditionalIncludeDirectories>
+      <ShowIncludes>
+      </ShowIncludes>
+      <PreprocessorDefinitions>DUK_OPT_NO_FILE_IO;DUK_OPT_CPP_EXCEPTIONS;DUK_OPT_NO_JX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>
+      </BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Prerelease|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
