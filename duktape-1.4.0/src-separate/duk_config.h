@@ -454,13 +454,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#if defined(DUK_COMPILING_DUKTAPE)
-/* Only include when compiling Duktape to avoid polluting application build
- * with a lot of unnecessary defines.
- */
-//#include <windows.h>
-#endif
-
 #define DUK_USE_OS_STRING "windows"
 
 /* On Windows, assume we're little endian.  Even Itanium which has a
@@ -657,7 +650,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>  /* varargs */
-#include "duk_setjmp_stub.h"
 #include <stddef.h>  /* e.g. ptrdiff_t */
 #include <math.h>
 #include <limits.h>
@@ -1108,17 +1100,8 @@
 
 #define DUK_USE_PACK_MSVC_PRAGMA
 
-//#if defined(_MSC_VER) && (_MSC_VER >= 1900)
 #define DUK_SNPRINTF     snprintf
 #define DUK_VSNPRINTF    vsnprintf
-//#else
-///* (v)snprintf() is missing before MSVC 2015.  Note that _(v)snprintf() does
-// * NOT NUL terminate on truncation, but Duktape code never assumes that.
-// * http://stackoverflow.com/questions/2915672/snprintf-and-visual-studio-2010
-// */
-//#define DUK_SNPRINTF     _snprintf
-//#define DUK_VSNPRINTF    _vsnprintf
-//#endif
 #define DUK_F_VARIADIC_MACROS_PROVIDED
 #elif defined(DUK_F_EMSCRIPTEN)
 /* --- Emscripten --- */
@@ -1825,17 +1808,6 @@ typedef struct duk_hthread duk_context;
 #define DUK_SETJMP(jb)        setjmp((jb))
 #define DUK_LONGJMP(jb)       longjmp((jb), 1)
 #endif
-
-//typedef FILE duk_file;
-//#if !defined(DUK_STDIN)
-//#define DUK_STDIN       stdin
-//#endif
-//#if !defined(DUK_STDOUT)
-//#define DUK_STDOUT      stdout
-//#endif
-//#if !defined(DUK_STDERR)
-//#define DUK_STDERR      stderr
-//#endif
 
 /* Special naming to avoid conflict with e.g. DUK_FREE() in duk_heap.h
  * (which is unfortunately named).  May sometimes need replacement, e.g.

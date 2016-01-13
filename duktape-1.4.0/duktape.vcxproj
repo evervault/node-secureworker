@@ -100,7 +100,6 @@
     <ClCompile Include="src-separate\duk_regexp_executor.c" />
     <ClCompile Include="src-separate\duk_replacements.c" />
     <ClCompile Include="src-separate\duk_selftest.c" />
-    <ClCompile Include="src-separate\duk_setjmp_stub.c" />
     <ClCompile Include="src-separate\duk_strings.c" />
     <ClCompile Include="src-separate\duk_tval.c" />
     <ClCompile Include="src-separate\duk_unicode_support.c" />
@@ -148,7 +147,6 @@
     <ClInclude Include="src-separate\duk_tval.h" />
     <ClInclude Include="src-separate\duk_unicode.h" />
     <ClInclude Include="src-separate\duk_util.h" />
-    <ClInclude Include="src-separate\duk_setjmp_stub.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FFDB79E5-4146-44EB-9A87-D04F188BB5CB}</ProjectGuid>

@@ -291,9 +291,6 @@
     <ClCompile Include="src-separate\duk_bi_date_sgx.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src-separate\duk_setjmp_stub.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src-separate\duk_api_internal.h">
@@ -396,9 +393,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src-separate\duktape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src-separate\duk_setjmp_stub.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
