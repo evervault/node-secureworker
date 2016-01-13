@@ -1834,16 +1834,16 @@ typedef struct duk_hthread duk_context;
 #define DUK_LONGJMP(jb)       longjmp((jb), 1)
 #endif
 
-//typedef FILE duk_file;
-//#if !defined(DUK_STDIN)
-//#define DUK_STDIN       stdin
-//#endif
-//#if !defined(DUK_STDOUT)
-//#define DUK_STDOUT      stdout
-//#endif
-//#if !defined(DUK_STDERR)
-//#define DUK_STDERR      stderr
-//#endif
+typedef FILE duk_file;
+#if !defined(DUK_STDIN)
+#define DUK_STDIN       stdin
+#endif
+#if !defined(DUK_STDOUT)
+#define DUK_STDOUT      stdout
+#endif
+#if !defined(DUK_STDERR)
+#define DUK_STDERR      stderr
+#endif
 
 /* Special naming to avoid conflict with e.g. DUK_FREE() in duk_heap.h
  * (which is unfortunately named).  May sometimes need replacement, e.g.
