@@ -1,0 +1,11 @@
+enclave {
+    trusted {
+        /* define ECALLs here. */
+        public double test();
+    };
+
+    untrusted {
+        /* define OCALLs here. */
+    
+    };
+};
