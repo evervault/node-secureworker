@@ -19,14 +19,6 @@ int _tmain(int argc, _TCHAR* argv[]) {
 	}
 	std::cerr << "sgx: created enclave " << enclave_id << std::endl;
 
-	double retval;
-	status = test(enclave_id, &retval);
-	if (status != SGX_SUCCESS) {
-		std::cerr << "test failed with " << status << std::endl;
-		return -1;
-	}
-	std::cerr << "test: returned " << retval << std::endl;
-
 	status = sgx_destroy_enclave(enclave_id);
 	if (status != SGX_SUCCESS) {
 		std::cerr << "sgx_destroy_enclave failed with " << status << std::endl;
