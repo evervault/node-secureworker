@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "duktape-enclave", "duktape-
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sample-client", "sample-client\sample-client.vcxproj", "{0C07BC6F-8704-49F5-A826-D71C1389FB5F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "M", "m\build\M.vcxproj", "{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -39,6 +41,14 @@ Global
 		{0C07BC6F-8704-49F5-A826-D71C1389FB5F}.Release|Win32.Build.0 = Release|Win32
 		{0C07BC6F-8704-49F5-A826-D71C1389FB5F}.Simulation|Win32.ActiveCfg = Simulation|Win32
 		{0C07BC6F-8704-49F5-A826-D71C1389FB5F}.Simulation|Win32.Build.0 = Simulation|Win32
+		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Debug|Win32.ActiveCfg = Release|Win32
+		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Debug|Win32.Build.0 = Release|Win32
+		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Prerelease|Win32.ActiveCfg = Prerelease|Win32
+		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Prerelease|Win32.Build.0 = Prerelease|Win32
+		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Release|Win32.ActiveCfg = Release|Win32
+		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Release|Win32.Build.0 = Release|Win32
+		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Simulation|Win32.ActiveCfg = Simulation|Win32
+		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Simulation|Win32.Build.0 = Simulation|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

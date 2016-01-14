@@ -1,0 +1,21 @@
+﻿Build started 1/13/2016 4:16:25 PM.
+     1>Project "C:\Users\wh0\work\duktape\m\build\M.vcxproj" on node 4 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Program Files (x86)\Intel\IntelSGXSDK\\include" /I"C:\Users\wh0\.node-gyp\0.10.40\src" /I"C:\Users\wh0\.node-gyp\0.10.40\deps\uv\include" /I"C:\Users\wh0\.node-gyp\0.10.40\deps\v8\include" /Zi /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D BUILDING_V8_SHARED=1 /D BUILDING_UV_SHARED=1 /D BUILDING_NODE_EXTENSION /D DEBUG /D _DEBUG /D _WINDLL /GF /Gm- /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\obj\M\\" /Fd"Debug\obj\M\vc110.pdb" /Gd /TP /wd4251 /analyze- /errorReport:prompt ..\m.cc
+         m.cc
+     1>C:\Users\wh0\.node-gyp\0.10.40\deps\v8\include\v8.h(218): warning C4506: no definition for inline function 'v8::Persistent<T> v8::Persistent<T>::New(v8::Handle<T>)'
+                 with
+                 [
+                     T=v8::Object
+                 ]
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Program Files (x86)\Intel\IntelSGXSDK\\include" /I"C:\Users\wh0\.node-gyp\0.10.40\src" /I"C:\Users\wh0\.node-gyp\0.10.40\deps\uv\include" /I"C:\Users\wh0\.node-gyp\0.10.40\deps\v8\include" /Zi /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE /D BUILDING_V8_SHARED=1 /D BUILDING_UV_SHARED=1 /D BUILDING_NODE_EXTENSION /D DEBUG /D _DEBUG /D _WINDLL /GF /Gm- /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\obj\M\\" /Fd"Debug\obj\M\vc110.pdb" /Gd /TC /wd4251 /analyze- /errorReport:prompt "duktape-enclave_u.c"
+         duktape-enclave_u.c
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\wh0\work\duktape\Debug\M.node" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Program Files (x86)\Intel\IntelSGXSDK\\bin\Win32\Debug" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib DelayImp.lib "C:\Users\wh0\.node-gyp\0.10.40\Debug\node.lib" sgx_urts.lib sgx_uae_service.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\wh0\work\duktape\Debug\M.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /MACHINE:X86 /SAFESEH /DLL Debug\obj\M\m.obj
+         "Debug\obj\M\duktape-enclave_u.obj"
+     1>LINK : fatal error LNK1104: cannot open file 'C:\Users\wh0\.node-gyp\0.10.40\Debug\node.lib'
+     1>Done Building Project "C:\Users\wh0\work\duktape\m\build\M.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:01.75
