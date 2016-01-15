@@ -1,18 +1,18 @@
 ==================================================================================================
-                Dynamic Link Library : duktape-enclave Project Overview
+                Dynamic Link Library : duk_enclave Project Overview
 ==================================================================================================
 
-Enclave Project Wizard has created this duktape-enclave project for you as a starting point.
+Enclave Project Wizard has created this duk_enclave project for you as a starting point.
 
 This file contains a summary of what you will find in each of the files that make up your project.
 
-duktape-enclave.vcxproj
+duk_enclave.vcxproj
     This is the main project file for projects generated using an Enclave Wizard. 
     It contains information about the version of the product that generated the file, and 
     information about the platforms, configurations, and project features selected with the
     Enclave Wizard.
 
-duktape-enclave.vcxproj.filters
+duk_enclave.vcxproj.filters
     This is the filters file for VC++ projects generated using an Enclave Wizard. 
     It contains information about the association between the files in your project 
     and the filters. This association is used in the IDE to show grouping of files with
