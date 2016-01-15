@@ -3,10 +3,11 @@ enclave {
 		/* define ECALLs here. */
 		public void duk_enclave_init();
 		public void duk_enclave_close();
-		public double duk_enclave_test();
+		public void duk_enclave_emit_message([in, string] const char *message);
 	};
 
 	untrusted {
 		/* define OCALLs here. */
+		void duk_enclave_post_message([in, string] const char *message);
 	};
 };

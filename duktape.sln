@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "duktape-dist", "duktape-1.4.0\duktape.vcxproj", "{FFDB79E5-4146-44EB-9A87-D04F188BB5CB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "duktape-enclave", "duktape-enclave\duktape-enclave.vcxproj", "{432E72D6-03FA-49C8-9DCC-C9CA84F967B2}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sample-client", "sample-client\sample-client.vcxproj", "{0C07BC6F-8704-49F5-A826-D71C1389FB5F}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "M", "m\build\M.vcxproj", "{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "duk_enclave", "duk_enclave\duk_enclave.vcxproj", "{BE790790-9991-4CCF-9C03-BFC61284E21C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,22 +23,6 @@ Global
 		{FFDB79E5-4146-44EB-9A87-D04F188BB5CB}.Release|Win32.Build.0 = Release|Win32
 		{FFDB79E5-4146-44EB-9A87-D04F188BB5CB}.Simulation|Win32.ActiveCfg = Release|Win32
 		{FFDB79E5-4146-44EB-9A87-D04F188BB5CB}.Simulation|Win32.Build.0 = Release|Win32
-		{432E72D6-03FA-49C8-9DCC-C9CA84F967B2}.Debug|Win32.ActiveCfg = Debug|Win32
-		{432E72D6-03FA-49C8-9DCC-C9CA84F967B2}.Debug|Win32.Build.0 = Debug|Win32
-		{432E72D6-03FA-49C8-9DCC-C9CA84F967B2}.Prerelease|Win32.ActiveCfg = Prerelease|Win32
-		{432E72D6-03FA-49C8-9DCC-C9CA84F967B2}.Prerelease|Win32.Build.0 = Prerelease|Win32
-		{432E72D6-03FA-49C8-9DCC-C9CA84F967B2}.Release|Win32.ActiveCfg = Release|Win32
-		{432E72D6-03FA-49C8-9DCC-C9CA84F967B2}.Release|Win32.Build.0 = Release|Win32
-		{432E72D6-03FA-49C8-9DCC-C9CA84F967B2}.Simulation|Win32.ActiveCfg = Simulation|Win32
-		{432E72D6-03FA-49C8-9DCC-C9CA84F967B2}.Simulation|Win32.Build.0 = Simulation|Win32
-		{0C07BC6F-8704-49F5-A826-D71C1389FB5F}.Debug|Win32.ActiveCfg = Debug|Win32
-		{0C07BC6F-8704-49F5-A826-D71C1389FB5F}.Debug|Win32.Build.0 = Debug|Win32
-		{0C07BC6F-8704-49F5-A826-D71C1389FB5F}.Prerelease|Win32.ActiveCfg = Prerelease|Win32
-		{0C07BC6F-8704-49F5-A826-D71C1389FB5F}.Prerelease|Win32.Build.0 = Prerelease|Win32
-		{0C07BC6F-8704-49F5-A826-D71C1389FB5F}.Release|Win32.ActiveCfg = Release|Win32
-		{0C07BC6F-8704-49F5-A826-D71C1389FB5F}.Release|Win32.Build.0 = Release|Win32
-		{0C07BC6F-8704-49F5-A826-D71C1389FB5F}.Simulation|Win32.ActiveCfg = Simulation|Win32
-		{0C07BC6F-8704-49F5-A826-D71C1389FB5F}.Simulation|Win32.Build.0 = Simulation|Win32
 		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Debug|Win32.ActiveCfg = Release|Win32
 		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Debug|Win32.Build.0 = Release|Win32
 		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Prerelease|Win32.ActiveCfg = Prerelease|Win32
@@ -49,6 +31,14 @@ Global
 		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Release|Win32.Build.0 = Release|Win32
 		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Simulation|Win32.ActiveCfg = Simulation|Win32
 		{17A43E9B-2F25-22C2-B572-FF0BC5F5249E}.Simulation|Win32.Build.0 = Simulation|Win32
+		{BE790790-9991-4CCF-9C03-BFC61284E21C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BE790790-9991-4CCF-9C03-BFC61284E21C}.Debug|Win32.Build.0 = Debug|Win32
+		{BE790790-9991-4CCF-9C03-BFC61284E21C}.Prerelease|Win32.ActiveCfg = Prerelease|Win32
+		{BE790790-9991-4CCF-9C03-BFC61284E21C}.Prerelease|Win32.Build.0 = Prerelease|Win32
+		{BE790790-9991-4CCF-9C03-BFC61284E21C}.Release|Win32.ActiveCfg = Release|Win32
+		{BE790790-9991-4CCF-9C03-BFC61284E21C}.Release|Win32.Build.0 = Release|Win32
+		{BE790790-9991-4CCF-9C03-BFC61284E21C}.Simulation|Win32.ActiveCfg = Simulation|Win32
+		{BE790790-9991-4CCF-9C03-BFC61284E21C}.Simulation|Win32.Build.0 = Simulation|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
