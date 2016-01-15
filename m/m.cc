@@ -2,7 +2,7 @@
 #include <node.h>
 #include <tchar.h>
 #include "sgx_urts.h"
-#include "build/duktape-enclave_u.h"
+#include "build/duk_enclave_u.h"
 
 sgx_enclave_id_t enclave_id;
 v8::Persistent<v8::Object> handlers;
