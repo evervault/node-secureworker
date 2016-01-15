@@ -2,41 +2,41 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Generated Files">
-      <UniqueIdentifier>{660fdb9d-aee9-4bb5-8d40-558ce4856872}</UniqueIdentifier>
+      <UniqueIdentifier>{ba37224a-f176-4fde-86e2-f1cfe0488f5d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{d05e372e-ee62-4c5c-ac8a-eadc9fd8fe4b}</UniqueIdentifier>
+      <UniqueIdentifier>{07318645-d360-49b5-a399-1cb9627090fd}</UniqueIdentifier>
       <Extensions>cpp;c;edl;def; .. and other options</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{5555b4ac-fc43-45de-9dc7-381b8b4201c3}</UniqueIdentifier>
+      <UniqueIdentifier>{c4a1f197-0396-456e-ab1a-5af9765a1e68}</UniqueIdentifier>
       <Extensions>h;hpp; .. and other options</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{24a10cf6-f37e-4698-b7fe-7b12e40d244f}</UniqueIdentifier>
+      <UniqueIdentifier>{ddd4f6a8-a3fa-4173-9df9-9eb364936d62}</UniqueIdentifier>
       <Extensions>rc;xml;pem; .. and other options</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="duktape-enclave_t.c">
+    <ClCompile Include="duk_enclave_t.c">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="duktape-enclave.cpp">
+    <ClCompile Include="duk_enclave.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="duktape-enclave_t.h">
+    <ClInclude Include="duk_enclave_t.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="duktape-enclave_private.pem">
+    <None Include="duk_enclave_private.pem">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="duktape-enclave.config.xml">
+    <Xml Include="duk_enclave.config.xml">
       <Filter>Resource Files</Filter>
     </Xml>
   </ItemGroup>
@@ -44,7 +44,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="duktape-enclave.edl">
+    <CustomBuild Include="duk_enclave.edl">
       <Filter>Source Files</Filter>
     </CustomBuild>
   </ItemGroup>
