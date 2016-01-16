@@ -7,15 +7,15 @@
     <Filter Include="..">
       <UniqueIdentifier>{739DB09A-CC57-A953-A6CF-F64FA08E4FA7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{33413f10-4bb9-42f4-9173-b52b5aaab9ae}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Generated Files">
-      <UniqueIdentifier>{dd684af5-408f-4996-90d9-d9cea9f500de}</UniqueIdentifier>
+      <UniqueIdentifier>{e20936af-5355-4520-a51d-9f0ecabfc14a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{fcd1b4c9-6640-45cb-b136-6eb26af9b4a1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\m.cc">
+    <ClCompile Include="..\secureworker-internal.cc">
       <Filter>..</Filter>
     </ClCompile>
     <None Include="..\binding.gyp">
