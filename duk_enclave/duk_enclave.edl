@@ -1,7 +1,7 @@
 enclave {
 	trusted {
 		/* define ECALLs here. */
-		public void duk_enclave_init();
+		public void duk_enclave_init(int key);
 		public void duk_enclave_close();
 		public void duk_enclave_emit_message([in, string] const char *message);
 	};
