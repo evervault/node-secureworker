@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "M", "m\build\M.vcxproj", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "duk_enclave", "duk_enclave\duk_enclave.vcxproj", "{BE790790-9991-4CCF-9C03-BFC61284E21C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sample-client", "sample-client\sample-client.vcxproj", "{5C6C9EC0-E8F4-47DB-B716-892EBA55B6C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -39,6 +41,14 @@ Global
 		{BE790790-9991-4CCF-9C03-BFC61284E21C}.Release|Win32.Build.0 = Release|Win32
 		{BE790790-9991-4CCF-9C03-BFC61284E21C}.Simulation|Win32.ActiveCfg = Simulation|Win32
 		{BE790790-9991-4CCF-9C03-BFC61284E21C}.Simulation|Win32.Build.0 = Simulation|Win32
+		{5C6C9EC0-E8F4-47DB-B716-892EBA55B6C5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5C6C9EC0-E8F4-47DB-B716-892EBA55B6C5}.Debug|Win32.Build.0 = Debug|Win32
+		{5C6C9EC0-E8F4-47DB-B716-892EBA55B6C5}.Prerelease|Win32.ActiveCfg = Prerelease|Win32
+		{5C6C9EC0-E8F4-47DB-B716-892EBA55B6C5}.Prerelease|Win32.Build.0 = Prerelease|Win32
+		{5C6C9EC0-E8F4-47DB-B716-892EBA55B6C5}.Release|Win32.ActiveCfg = Release|Win32
+		{5C6C9EC0-E8F4-47DB-B716-892EBA55B6C5}.Release|Win32.Build.0 = Release|Win32
+		{5C6C9EC0-E8F4-47DB-B716-892EBA55B6C5}.Simulation|Win32.ActiveCfg = Simulation|Win32
+		{5C6C9EC0-E8F4-47DB-B716-892EBA55B6C5}.Simulation|Win32.Build.0 = Simulation|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
