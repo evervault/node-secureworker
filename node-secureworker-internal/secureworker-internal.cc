@@ -40,7 +40,7 @@ void duk_enclave_post_message(const char *message) {
 	handlers->Get(v8::String::NewSymbol("postMessage")).As<v8::Function>()->Call(handlers, 1, args);
 }
 
-static void m_init(v8::Handle<v8::Object> exports) {
+static void secureworker_init(v8::Handle<v8::Object> exports) {
 	v8::Local<v8::Object> native = v8::Object::New();
 	NODE_SET_METHOD(native, "emitMessage", native_emit_message);
 	exports->Set(v8::String::NewSymbol("native"), native);
@@ -65,7 +65,7 @@ static void m_init(v8::Handle<v8::Object> exports) {
 }
 
 // TODO: Do modules have to clean up after themselves at some point? We should destroy the enclave.
-static void m_close() {
+static void secureworker_close() {
 	{
 		const sgx_status_t status = duk_enclave_close(enclave_id);
 		if (status != SGX_SUCCESS) {
@@ -82,4 +82,4 @@ static void m_close() {
 	}
 }
 
-NODE_MODULE(m, m_init);
+NODE_MODULE(secureworker_internal, secureworker_init);
