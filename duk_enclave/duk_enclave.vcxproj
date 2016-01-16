@@ -189,6 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="duk_enclave_t.h" />
+    <ClInclude Include="scripts.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="duk_enclave.edl">
