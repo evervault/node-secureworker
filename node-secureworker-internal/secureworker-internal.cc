@@ -16,7 +16,7 @@ void throw_with_status(const char *message, const sgx_status_t status) {
 sgx_enclave_id_t enclave_id;
 v8::Persistent<v8::Object> handlers;
 
-v8::Handle<v8::Value> native_emit_message(const v8::Arguments& args) {
+v8::Handle<v8::Value> native_emit_message(const v8::Arguments &args) {
 	v8::HandleScope scope;
 	if (!args[0]->IsString()) {
 		v8::ThrowException(v8::Exception::TypeError(v8::String::New("Argument error")));
