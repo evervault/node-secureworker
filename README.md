@@ -1,19 +1,36 @@
 This is duktape in an enclave.
 
-TODO:
+## Build instructions
+First run
+```
+openssl.exe genrsa -out duk_enclave\duk_enclave_private.pem -3 3072
+```
+
+(The SGX SDK puts openssl.exe in `%PATH%`.)
+(Normally the SGX SDK does this for you when you create an enclave project.)
+
+Then you can build it in Visual Studio
+
+## TODO
 - .gitignore and remove unnecessary files from repo
 - port changes to original duktape source (this code is modified from the release tarball)
 - wrap code changes in a new config flag or something
 
 ## Important configuration
+### duktape-dist
 - SGX include dirs, `/NODEFAULTLIB` - Compile for SGX platform.
-- Working Directory set to `$(OutDir)` - The enclave dll is there.
 - `DUK_OPT_NO_FILE_IO` - File I/O is not available in enclave.
 - `DUK_OPT_CPP_EXCEPTIONS` - The SGX SDK doesn't support `setjmp`.
 - `DUK_OPT_NO_JX` - The SGX SDK doesn't support `sscanf`, which JX needs.
 - `/TP` - Compile as C++ because we need C++ exceptions.
 
-## Code changes
+### sample-client
+- Working Directory set to `$(OutDir)` - The enclave dll is there.
+
+### node-secureworker-internal
+- Use Release configuration, because node-gyp doesn't download Debug libraries.
+
+## Code changes (duktape-dist)
 - `DUK_SNPRINTF` in duk_bi_date.c - The SGX SDK doesn't support `sprintf` (without the "n"). Provide `DUK_BI_DATE_ISO8601_BUFSIZE`.
 - `duk_bi_date_get_*_sgx` - Stubbed out routines for getting the time and locale information from the OS. Consider using SGX's Trusted Time system to implement this for real.
 - Don't include `<windows.h>` - We're not running on Windows.
