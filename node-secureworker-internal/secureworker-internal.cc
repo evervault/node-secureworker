@@ -8,13 +8,29 @@
 #include "sgx_urts.h"
 #include "build/duk_enclave_u.h"
 
-void throw_with_status(const char *message, const sgx_status_t status) {
+static struct entry_info;
+
+__declspec(thread) entry_info *thread_entry = nullptr;
+
+static struct entry_info {
+	entry_info *previous;
+	v8::Handle<v8::Object> entrant;
+	entry_info(v8::Handle<v8::Object> entrant) : previous(thread_entry), entrant(entrant) {
+		thread_entry = this;
+	}
+	~entry_info() {
+		assert(thread_entry == this);
+		thread_entry = previous;
+	}
+};
+
+static void throw_with_status(const char *message, const sgx_status_t status) {
 	std::stringstream ss;
 	ss << message << " (0x" << std::hex << std::setw(4) << std::setfill('0') << status << ")";
 	v8::ThrowException(v8::Exception::Error(v8::String::New(ss.str().c_str())));
 }
 
-class SecureWorkerInternal : public node::ObjectWrap {
+static class SecureWorkerInternal : public node::ObjectWrap {
 public:
 	sgx_enclave_id_t enclave_id;
 	explicit SecureWorkerInternal(const char *file_name);
@@ -71,6 +87,7 @@ v8::Handle<v8::Value> SecureWorkerInternal::New(const v8::Arguments &arguments) 
 	v8::String::Utf8Value arg0_utf8(arguments[0]);
 	SecureWorkerInternal *secure_worker_internal;
 	try {
+		entry_info entry(arguments.This());
 		secure_worker_internal = new SecureWorkerInternal(*arg0_utf8);
 	} catch (sgx_status_t status) {
 		throw_with_status("sgx_create_enclave failed", status);
@@ -90,6 +107,7 @@ v8::Handle<v8::Value> SecureWorkerInternal::Init(const v8::Arguments &arguments)
 	int key = arguments[0]->NumberValue();
 	SecureWorkerInternal *secure_worker_internal = node::ObjectWrap::Unwrap<SecureWorkerInternal>(arguments.This());
 	try {
+		entry_info entry(arguments.This());
 		secure_worker_internal->init(key);
 	} catch (sgx_status_t status) {
 		throw_with_status("duk_enclave_init failed", status);
@@ -102,6 +120,7 @@ v8::Handle<v8::Value> SecureWorkerInternal::Close(const v8::Arguments &arguments
 	v8::HandleScope scope;
 	SecureWorkerInternal *secure_worker_internal = node::ObjectWrap::Unwrap<SecureWorkerInternal>(arguments.This());
 	try {
+		entry_info entry(arguments.This());
 		secure_worker_internal->close();
 	} catch (sgx_status_t status) {
 		throw_with_status("duk_enclave_close failed", status);
@@ -119,6 +138,7 @@ v8::Handle<v8::Value> SecureWorkerInternal::EmitMessage(const v8::Arguments &arg
 	v8::String::Utf8Value arg0_utf8(arguments[0]);
 	SecureWorkerInternal *secure_worker_internal = node::ObjectWrap::Unwrap<SecureWorkerInternal>(arguments.This());
 	try {
+		entry_info entry(arguments.This());
 		secure_worker_internal->emitMessage(*arg0_utf8);
 	} catch (sgx_status_t status) {
 		throw_with_status("duk_enclave_emit_message failed", status);
@@ -127,25 +147,24 @@ v8::Handle<v8::Value> SecureWorkerInternal::EmitMessage(const v8::Arguments &arg
 	return scope.Close(v8::Undefined());
 }
 
-v8::Persistent<v8::Object> handlers;
-
-void secureworker_internal_init(v8::Handle<v8::Object> exports, v8::Handle<v8::Object> module) {
+static void secureworker_internal_init(v8::Handle<v8::Object> exports, v8::Handle<v8::Object> module) {
 	v8::Local<v8::FunctionTemplate> function_template = v8::FunctionTemplate::New(SecureWorkerInternal::New);
 	function_template->SetClassName(v8::String::NewSymbol("SecureWorkerInternal"));
 	function_template->InstanceTemplate()->SetInternalFieldCount(1);
 	function_template->PrototypeTemplate()->Set(v8::String::NewSymbol("init"), v8::FunctionTemplate::New(SecureWorkerInternal::Init)->GetFunction());
 	function_template->PrototypeTemplate()->Set(v8::String::NewSymbol("close"), v8::FunctionTemplate::New(SecureWorkerInternal::Close)->GetFunction());
 	function_template->PrototypeTemplate()->Set(v8::String::NewSymbol("emitMessage"), v8::FunctionTemplate::New(SecureWorkerInternal::EmitMessage)->GetFunction());
-	v8::Local<v8::Function> constructor = function_template->GetFunction();
-	handlers = v8::Persistent<v8::Object>::New(v8::Object::New());
-	constructor->Set(v8::String::NewSymbol("handlers"), handlers);
-	module->Set(v8::String::NewSymbol("exports"), constructor);
+	function_template->PrototypeTemplate()->Set(v8::String::NewSymbol("handlePostMessage"), v8::Null());
+	module->Set(v8::String::NewSymbol("exports"), function_template->GetFunction());
 }
 
 void duk_enclave_post_message(const char *message) {
 	v8::HandleScope scope;
+	assert(thread_entry != nullptr);
+	v8::Local<v8::Value> handle_post_message = thread_entry->entrant->Get(v8::String::NewSymbol("handlePostMessage"));
+	if (!handle_post_message->IsFunction()) return;
 	v8::Local<v8::Value> arguments[] = {v8::String::New(message)};
-	handlers->Get(v8::String::NewSymbol("postMessage")).As<v8::Function>()->Call(handlers, 1, arguments);
+	handle_post_message.As<v8::Function>()->Call(thread_entry->entrant, 1, arguments);
 }
 
 NODE_MODULE(secureworker_internal, secureworker_internal_init);
