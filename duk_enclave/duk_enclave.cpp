@@ -31,7 +31,7 @@ static duk_ret_t native_import_script(duk_context *ctx) {
 	return 0;
 }
 
-const duk_function_list_entry native_methods[] = {
+static const duk_function_list_entry native_methods[] = {
 	{"postMessage", native_post_message, 1},
 	{"nextTick", native_next_tick, 1},
 	{"importScript", native_import_script, 1},
@@ -54,7 +54,7 @@ static void spin_microtasks(duk_context *ctx) {
 	duk_pop_3(ctx);
 }
 
-duk_context *ctx = NULL;
+static duk_context *ctx = NULL;
 
 void duk_enclave_init(int key) {
 	if (ctx != NULL) abort();
