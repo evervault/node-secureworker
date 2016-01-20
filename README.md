@@ -1,7 +1,7 @@
-This is duktape in an enclave.
+This is duktape in an enclave, in Node.js.
 
 ## Build instructions
-First run
+First, run
 ```
 openssl.exe genrsa -out duk_enclave\duk_enclave_private.pem -3 3072
 ```
@@ -11,8 +11,23 @@ openssl.exe genrsa -out duk_enclave\duk_enclave_private.pem -3 3072
 
 Then you can build it in Visual Studio
 
+## Usage
+```js
+var SecureWorkerInternal = require('./Release/secureworker_internal');
+// Pass the location of the enclave DLL.
+var wi = new SecureWorkerInternal('./Debug/duk_enclave.signed.dll');
+wi.handlePostMesage = function (message) {
+  console.log('from wi:', message);
+};
+// Pass the index of the script to run.
+wi.init(0);
+wi.emitMessage('hello from outside');
+wi.close();
+// The enclave continues to exist until the SecureWorkerInternal instance is garbage collected.
+wi = null;
+```
+
 ## TODO
-- .gitignore and remove unnecessary files from repo
 - port changes to original duktape source (this code is modified from the release tarball)
 - wrap code changes in a new config flag or something
 
