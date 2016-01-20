@@ -2,14 +2,16 @@ This is duktape in an enclave, in Node.js.
 
 ## Build instructions
 First, run
-```
+```sh
 openssl.exe genrsa -out duk_enclave\duk_enclave_private.pem -3 3072
 ```
 
 (The SGX SDK puts openssl.exe in `%PATH%`.)
 (Normally the SGX SDK does this for you when you create an enclave project.)
 
-Then you can build it in Visual Studio
+Enter the JavaScript files in `duk_enclave/scripts.h`.
+
+Then you can build it in Visual Studio.
 
 ## Usage
 ```js
