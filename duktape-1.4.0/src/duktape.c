@@ -81363,14 +81363,6 @@ DUK_INTERNAL void duk_regexp_match_force_global(duk_hthread *thr) {
 
 /* include removed: duk_internal.h */
 
-#if defined(DUK_USE_COMPUTED_NAN)
-DUK_INTERNAL double duk_computed_nan;
-#endif
-
-#if defined(DUK_USE_COMPUTED_INFINITY)
-DUK_INTERNAL double duk_computed_infinity;
-#endif
-
 #if defined(DUK_USE_REPL_FPCLASSIFY)
 DUK_INTERNAL int duk_repl_fpclassify(double x) {
 	duk_double_union u;
