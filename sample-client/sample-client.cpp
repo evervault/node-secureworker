@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 
+#include <chrono> // %%%
 #include <iostream>
 
 #include "sgx_urts.h"
@@ -23,25 +24,24 @@ int _tmain(int argc, _TCHAR* argv[]) {
 			exit(status);
 		}
 	}
-	{
-		const sgx_status_t status = duk_enclave_init(enclave_id, 0);
-		if (status != SGX_SUCCESS) {
-			std::cerr << "duk_enclave_init failed" << std::endl;
-			exit(status);
+	for (size_t i = 0; i < 26; i++) {
+		std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+		{
+			const sgx_status_t status = duk_enclave_init(enclave_id, i);
+			if (status != SGX_SUCCESS) {
+				std::cerr << "duk_enclave_init failed" << std::endl;
+				exit(status);
+			}
 		}
-	}
-	{
-		const sgx_status_t status = duk_enclave_emit_message(enclave_id, "hello world");
-		if (status != SGX_SUCCESS) {
-			std::cerr << "duk_enclave_emit_message failed" << std::endl;
-			exit(status);
-		}
-	}
-	{
-		const sgx_status_t status = duk_enclave_close(enclave_id);
-		if (status != SGX_SUCCESS) {
-			std::cerr << "duk_enclave_close failed" << std::endl;
-			exit(status);
+		std::chrono::steady_clock::time_point finish = std::chrono::steady_clock::now();
+		std::chrono::steady_clock::duration duration = finish - start;
+		std::cerr << std::fixed << std::chrono::duration<double, std::micro>(duration).count() << " us" << std::endl;
+		{
+			const sgx_status_t status = duk_enclave_close(enclave_id);
+			if (status != SGX_SUCCESS) {
+				std::cerr << "duk_enclave_close failed" << std::endl;
+				exit(status);
+			}
 		}
 	}
 	{
