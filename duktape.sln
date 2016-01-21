@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sample-client", "sample-cli
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "node-secureworker-internal", "node-secureworker-internal\build\node-secureworker-internal.vcxproj", "{8BBA1136-A590-77AD-0D21-08F025628ADC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "duktape-untrusted-benchmark", "duktape-untrusted-benchmark\duktape-untrusted-benchmark.vcxproj", "{EDF57321-8C51-4F46-9F66-616F09921BB1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -73,6 +75,18 @@ Global
 		{8BBA1136-A590-77AD-0D21-08F025628ADC}.Simulation|Win32.ActiveCfg = Simulation|Win32
 		{8BBA1136-A590-77AD-0D21-08F025628ADC}.Simulation|Win32.Build.0 = Simulation|Win32
 		{8BBA1136-A590-77AD-0D21-08F025628ADC}.Simulation|x64.ActiveCfg = Simulation|Win32
+		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Debug|Win32.Build.0 = Debug|Win32
+		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Debug|x64.ActiveCfg = Debug|Win32
+		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Prerelease|Win32.ActiveCfg = Release|Win32
+		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Prerelease|Win32.Build.0 = Release|Win32
+		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Prerelease|x64.ActiveCfg = Release|Win32
+		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Release|Win32.ActiveCfg = Release|Win32
+		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Release|Win32.Build.0 = Release|Win32
+		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Release|x64.ActiveCfg = Release|Win32
+		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Simulation|Win32.ActiveCfg = Release|Win32
+		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Simulation|Win32.Build.0 = Release|Win32
+		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Simulation|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
