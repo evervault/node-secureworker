@@ -9,6 +9,8 @@
 #include "sgx_urts.h"
 #include "build/duk_enclave_u.h"
 
+// Track the "current" ECALL's associated Object so that OCALLS can find the callback.
+
 static struct entry_info;
 
 __declspec(thread) entry_info *thread_entry = nullptr;
@@ -25,6 +27,8 @@ static struct entry_info {
 	}
 };
 
+// Convenience class for communicating SGX statuses to v8 exceptions
+
 static struct sgx_error {
 	sgx_status_t status;
 	const char *source;
@@ -36,6 +40,8 @@ static struct sgx_error {
 		v8::ThrowException(v8::Exception::Error(v8::String::New(ss.str().c_str())));
 	}
 };
+
+// The rest of the stuff, which is per-instance
 
 static class SecureWorkerInternal : public node::ObjectWrap {
 public:
