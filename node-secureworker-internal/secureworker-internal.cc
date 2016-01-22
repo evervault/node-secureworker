@@ -7,7 +7,6 @@
 #include <tchar.h>
 
 #include "sgx_urts.h"
-#include "sgx_uae_service.h"
 #include "build/duk_enclave_u.h"
 
 static struct entry_info;
@@ -26,11 +25,17 @@ static struct entry_info {
 	}
 };
 
-static void throw_with_status(const char *message, const sgx_status_t status) {
-	std::stringstream ss;
-	ss << message << " (0x" << std::hex << std::setw(4) << std::setfill('0') << status << ")";
-	v8::ThrowException(v8::Exception::Error(v8::String::New(ss.str().c_str())));
-}
+static struct sgx_error {
+	sgx_status_t status;
+	const char *source;
+	sgx_error(sgx_status_t status, const char *source) : status(status), source(source) {
+	}
+	void rethrow() {
+		std::stringstream ss;
+		ss << source << " failed (0x" << std::hex << std::setw(4) << std::setfill('0') << status << ")";
+		v8::ThrowException(v8::Exception::Error(v8::String::New(ss.str().c_str())));
+	}
+};
 
 static class SecureWorkerInternal : public node::ObjectWrap {
 public:
@@ -39,7 +44,6 @@ public:
 	~SecureWorkerInternal();
 	void init(int key);
 	void close();
-	void getQuote();
 	void emitMessage(const char *message);
 	static v8::Handle<v8::Value> New(const v8::Arguments &arguments);
 	static v8::Handle<v8::Value> Init(const v8::Arguments &arguments);
@@ -48,59 +52,43 @@ public:
 };
 
 SecureWorkerInternal::SecureWorkerInternal(const char *file_name) : enclave_id(0) {
-	sgx_launch_token_t launch_token;
-	int launch_token_updated;
-	const sgx_status_t status = sgx_create_enclave(file_name, SGX_DEBUG_FLAG, &launch_token, &launch_token_updated, &enclave_id, NULL);
-	if (status != SGX_SUCCESS) throw status;
+	{
+		sgx_launch_token_t launch_token;
+		int launch_token_updated;
+		const sgx_status_t status = sgx_create_enclave(file_name, SGX_DEBUG_FLAG, &launch_token, &launch_token_updated, &enclave_id, NULL);
+		if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_create_enclave");
+	}
 	std::cerr << "created enclave " << enclave_id << std::endl; // %%%
 }
 
 SecureWorkerInternal::~SecureWorkerInternal() {
-	const sgx_status_t status = sgx_destroy_enclave(enclave_id);
-	if (status != SGX_SUCCESS) throw status;
+	{
+		const sgx_status_t status = sgx_destroy_enclave(enclave_id);
+		if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_destroy_enclave");
+	}
 	std::cerr << "destroyed enclave " << enclave_id << std::endl; // %%%
 	enclave_id = 0;
 }
 
 void SecureWorkerInternal::init(int key) {
-	const sgx_status_t status = duk_enclave_init(enclave_id, key);
-	if (status != SGX_SUCCESS) throw status;
+	{
+		const sgx_status_t status = duk_enclave_init(enclave_id, key);
+		if (status != SGX_SUCCESS) throw sgx_error(status, "duk_enclave_init");
+	}
 }
 
 void SecureWorkerInternal::close() {
-	const sgx_status_t status = duk_enclave_close(enclave_id);
-	if (status != SGX_SUCCESS) throw status;
-}
-
-void SecureWorkerInternal::getQuote() {
-	sgx_target_info_t target_info;
-	sgx_epid_group_id_t epid_group_id;
 	{
-		const sgx_status_t status = sgx_init_quote(&target_info, &epid_group_id);
-		if (status != SGX_SUCCESS) throw status;
+		const sgx_status_t status = duk_enclave_close(enclave_id);
+		if (status != SGX_SUCCESS) throw sgx_error(status, "duk_enclave_close");
 	}
-	uint32_t quote_size;
-	{
-		const sgx_status_t status = sgx_get_quote_size(nullptr, &quote_size);
-		if (status != SGX_SUCCESS) throw status;
-	}
-	sgx_report_t report;
-	{
-		// TODO: get report
-	}
-	node::Buffer *quote_buffer = node::Buffer::New(quote_size);
-	{
-		const sgx_spid_t spid = {"everybody"};
-		sgx_quote_t *quote = reinterpret_cast<sgx_quote_t *>(node::Buffer::Data(quote_buffer));
-		const sgx_status_t status = sgx_get_quote(&report, SGX_UNLINKABLE_SIGNATURE, &spid, nullptr, nullptr, 0, nullptr, quote, quote_size);
-		if (status != SGX_SUCCESS) throw status;
-	}
-	return quote_buffer->handle_;
 }
 
 void SecureWorkerInternal::emitMessage(const char *message) {
-	const sgx_status_t status = duk_enclave_emit_message(enclave_id, message);
-	if (status != SGX_SUCCESS) throw status;
+	{
+		const sgx_status_t status = duk_enclave_emit_message(enclave_id, message);
+		if (status != SGX_SUCCESS) throw sgx_error(status, "duk_enclave_emit_message");
+	}
 }
 
 v8::Handle<v8::Value> SecureWorkerInternal::New(const v8::Arguments &arguments) {
@@ -118,10 +106,11 @@ v8::Handle<v8::Value> SecureWorkerInternal::New(const v8::Arguments &arguments) 
 	try {
 		entry_info entry(arguments.This());
 		secure_worker_internal = new SecureWorkerInternal(*arg0_utf8);
-	} catch (sgx_status_t status) {
-		throw_with_status("sgx_create_enclave failed", status);
+	} catch (sgx_error error) {
+		error.rethrow();
 		return scope.Close(v8::Undefined());
 	}
+
 	secure_worker_internal->Wrap(arguments.This());
 	// Why doesn't this need scope.Close?
 	return arguments.This();
@@ -138,8 +127,8 @@ v8::Handle<v8::Value> SecureWorkerInternal::Init(const v8::Arguments &arguments)
 	try {
 		entry_info entry(arguments.This());
 		secure_worker_internal->init(key);
-	} catch (sgx_status_t status) {
-		throw_with_status("duk_enclave_init failed", status);
+	} catch (sgx_error error) {
+		error.rethrow();
 		return scope.Close(v8::Undefined());
 	}
 	return scope.Close(v8::Undefined());
@@ -151,8 +140,8 @@ v8::Handle<v8::Value> SecureWorkerInternal::Close(const v8::Arguments &arguments
 	try {
 		entry_info entry(arguments.This());
 		secure_worker_internal->close();
-	} catch (sgx_status_t status) {
-		throw_with_status("duk_enclave_close failed", status);
+	} catch (sgx_error error) {
+		error.rethrow();
 		return scope.Close(v8::Undefined());
 	}
 	return scope.Close(v8::Undefined());
@@ -169,8 +158,8 @@ v8::Handle<v8::Value> SecureWorkerInternal::EmitMessage(const v8::Arguments &arg
 	try {
 		entry_info entry(arguments.This());
 		secure_worker_internal->emitMessage(*arg0_utf8);
-	} catch (sgx_status_t status) {
-		throw_with_status("duk_enclave_emit_message failed", status);
+	} catch (sgx_error error) {
+		error.rethrow();
 		return scope.Close(v8::Undefined());
 	}
 	return scope.Close(v8::Undefined());

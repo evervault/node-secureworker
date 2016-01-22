@@ -8,8 +8,10 @@
 static duk_ret_t native_post_message(duk_context *ctx) {
 	const char * const message = duk_get_string(ctx, 0);
 	if (message == NULL) return DUK_RET_TYPE_ERROR;
-	const sgx_status_t status = duk_enclave_post_message(message);
-	if (status != SGX_SUCCESS) abort();
+	{
+		const sgx_status_t status = duk_enclave_post_message(message);
+		if (status != SGX_SUCCESS) abort();
+	}
 	return 0;
 }
 
