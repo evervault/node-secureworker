@@ -1,4 +1,5 @@
 #include <node.h>
+#include <node_buffer.h>
 
 #include <iomanip>
 #include <iostream> // %%%
@@ -6,6 +7,7 @@
 #include <tchar.h>
 
 #include "sgx_urts.h"
+#include "sgx_uae_service.h"
 #include "build/duk_enclave_u.h"
 
 static struct entry_info;
@@ -37,6 +39,7 @@ public:
 	~SecureWorkerInternal();
 	void init(int key);
 	void close();
+	void getQuote();
 	void emitMessage(const char *message);
 	static v8::Handle<v8::Value> New(const v8::Arguments &arguments);
 	static v8::Handle<v8::Value> Init(const v8::Arguments &arguments);
@@ -67,6 +70,32 @@ void SecureWorkerInternal::init(int key) {
 void SecureWorkerInternal::close() {
 	const sgx_status_t status = duk_enclave_close(enclave_id);
 	if (status != SGX_SUCCESS) throw status;
+}
+
+void SecureWorkerInternal::getQuote() {
+	sgx_target_info_t target_info;
+	sgx_epid_group_id_t epid_group_id;
+	{
+		const sgx_status_t status = sgx_init_quote(&target_info, &epid_group_id);
+		if (status != SGX_SUCCESS) throw status;
+	}
+	uint32_t quote_size;
+	{
+		const sgx_status_t status = sgx_get_quote_size(nullptr, &quote_size);
+		if (status != SGX_SUCCESS) throw status;
+	}
+	sgx_report_t report;
+	{
+		// TODO: get report
+	}
+	node::Buffer *quote_buffer = node::Buffer::New(quote_size);
+	{
+		const sgx_spid_t spid = {"everybody"};
+		sgx_quote_t *quote = reinterpret_cast<sgx_quote_t *>(node::Buffer::Data(quote_buffer));
+		const sgx_status_t status = sgx_get_quote(&report, SGX_UNLINKABLE_SIGNATURE, &spid, nullptr, nullptr, 0, nullptr, quote, quote_size);
+		if (status != SGX_SUCCESS) throw status;
+	}
+	return quote_buffer->handle_;
 }
 
 void SecureWorkerInternal::emitMessage(const char *message) {
