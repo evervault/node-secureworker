@@ -1,5 +1,6 @@
 #include "duk_enclave_t.h"
 
+#include "sgx_tcrypto.h"
 #include "sgx_trts.h"
 #include "duktape.h"
 
@@ -10,7 +11,7 @@ static duk_ret_t native_post_message(duk_context *ctx) {
 	if (message == NULL) return DUK_RET_TYPE_ERROR;
 	{
 		const sgx_status_t status = duk_enclave_post_message(message);
-		if (status != SGX_SUCCESS) abort();
+		if (status != SGX_SUCCESS) return DUK_RET_INTERNAL_ERROR;
 	}
 	return 0;
 }
@@ -34,10 +35,45 @@ static duk_ret_t native_import_script(duk_context *ctx) {
 	return 0;
 }
 
+static duk_ret_t native_encode_string(duk_context *ctx) {
+	duk_size_t in_size;
+	const char * const in = duk_get_lstring(ctx, 0, &in_size);
+	if (in == NULL) return DUK_RET_TYPE_ERROR;
+	duk_push_fixed_buffer(ctx, in_size);
+	memcpy(duk_get_buffer_data(ctx, -1, NULL), in, in_size);
+	duk_push_buffer_object(ctx, -1, 0, in_size, DUK_BUFOBJ_UINT8ARRAY);
+	return 1;
+}
+
+static duk_ret_t native_decode_string(duk_context *ctx) {
+	duk_size_t in_size;
+	const void * const in = duk_get_buffer_data(ctx, 0, &in_size);
+	if (in == NULL) return DUK_RET_TYPE_ERROR;
+	duk_push_lstring(ctx, reinterpret_cast<const char *>(in), in_size);
+	return 1;
+}
+
+static duk_ret_t native_sha256_digest(duk_context *ctx) {
+	duk_size_t data_size;
+	const void * const data = duk_get_buffer_data(ctx, 0, &data_size);
+	if (data == NULL) return DUK_RET_TYPE_ERROR;
+	duk_push_fixed_buffer(ctx, SGX_SHA256_HASH_SIZE);
+	void *result = duk_get_buffer_data(ctx, -1, NULL);
+	{
+		const sgx_status_t status = sgx_sha256_msg(reinterpret_cast<const uint8_t *>(data), data_size, reinterpret_cast<sgx_sha256_hash_t *>(result));
+		if (status != SGX_SUCCESS) abort();
+	}
+	duk_push_buffer_object(ctx, -1, 0, SGX_SHA256_HASH_SIZE, DUK_BUFOBJ_ARRAYBUFFER);
+	return 1;
+}
+
 static const duk_function_list_entry native_methods[] = {
 	{"postMessage", native_post_message, 1},
 	{"nextTick", native_next_tick, 1},
 	{"importScript", native_import_script, 1},
+	{"encodeString", native_encode_string, 1},
+	{"decodeString", native_decode_string, 1},
+	{"sha256Digest", native_sha256_digest, 1},
 	{NULL, NULL, 0},
 };
 

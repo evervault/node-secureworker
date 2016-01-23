@@ -11,6 +11,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "node-secureworker-internal"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "duktape-untrusted-benchmark", "duktape-untrusted-benchmark\duktape-untrusted-benchmark.vcxproj", "{EDF57321-8C51-4F46-9F66-616F09921BB1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{95C00217-4DC3-4A7F-8BF3-F01077603E92}"
+	ProjectSection(SolutionItems) = preProject
+		run.js = run.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
