@@ -1,11 +1,12 @@
-const size_t MAX_SCRIPT = 2;
+const size_t MAX_SCRIPT = 1;
 const char *SCRIPTS[MAX_SCRIPT] = {
-	"_dukEnclaveNative.importScript(1);\n"
 	"_dukEnclaveHandlers.emitMessage = function (message) {\n"
-	"	var s = i++;\n"
-	"	_dukEnclaveNative.nextTick(function () { _dukEnclaveNative.postMessage(message + ' (' + s + 'b)'); });\n"
-	"	_dukEnclaveNative.postMessage(message + ' (' + s + ')');\n"
+	"	_dukEnclaveNative.postMessage(\n"
+	"		Duktape.enc('hex',\n"
+	"			_dukEnclaveNative.sha256Digest(\n"
+	"				_dukEnclaveNative.encodeString(message)\n"
+	"			)\n"
+	"		)\n"
+	"	);\n"
 	"};\n",
-
-	"var i = 100;\n",
 };
