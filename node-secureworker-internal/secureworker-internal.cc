@@ -11,11 +11,11 @@
 
 // Track the "current" ECALL's associated Object so that OCALLS can find the callback.
 
-static struct entry_info;
+struct entry_info;
 
 __declspec(thread) entry_info *thread_entry = nullptr;
 
-static struct entry_info {
+struct entry_info {
 	entry_info *previous;
 	v8::Handle<v8::Object> entrant;
 	entry_info(v8::Handle<v8::Object> entrant) : previous(thread_entry), entrant(entrant) {
@@ -29,7 +29,7 @@ static struct entry_info {
 
 // Convenience class for communicating SGX statuses to v8 exceptions
 
-static struct sgx_error {
+struct sgx_error {
 	sgx_status_t status;
 	const char *source;
 	sgx_error(sgx_status_t status, const char *source) : status(status), source(source) {
@@ -43,7 +43,7 @@ static struct sgx_error {
 
 // The rest of the stuff, which is per-instance
 
-static class SecureWorkerInternal : public node::ObjectWrap {
+class SecureWorkerInternal : public node::ObjectWrap {
 public:
 	sgx_enclave_id_t enclave_id;
 	explicit SecureWorkerInternal(const char *file_name);
@@ -128,7 +128,7 @@ v8::Handle<v8::Value> SecureWorkerInternal::Init(const v8::Arguments &arguments)
 		v8::ThrowException(v8::Exception::TypeError(v8::String::New("Argument error")));
 		return scope.Close(v8::Undefined());
 	}
-	int key = arguments[0]->NumberValue();
+	int key = static_cast<int>(arguments[0]->NumberValue());
 	SecureWorkerInternal *secure_worker_internal = node::ObjectWrap::Unwrap<SecureWorkerInternal>(arguments.This());
 	try {
 		entry_info entry(arguments.This());

@@ -309,7 +309,7 @@ static duk_ret_t native_ecdsa_verify(duk_context *ctx) {
 	duk_size_t key_size;
 	void * const key = duk_get_buffer_data(ctx, 0, &key_size);
 	duk_size_t signature_size;
-	void * const signature = duk_get_buffer_data(ctx, 1, &key_size);
+	void * const signature = duk_get_buffer_data(ctx, 1, &signature_size);
 	duk_size_t data_size;
 	const void * const data = duk_get_buffer_data(ctx, 2, &data_size);
 	if (key_size != sizeof(sgx_ec256_private_t) || signature_size != sizeof(sgx_ec256_signature_t)) return DUK_RET_ERROR;
