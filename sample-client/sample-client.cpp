@@ -31,7 +31,7 @@ int _tmain(int argc, _TCHAR* argv[]) {
 		}
 	}
 	{
-		const sgx_status_t status = duk_enclave_emit_message(enclave_id, "hello world");
+		const sgx_status_t status = duk_enclave_emit_message(enclave_id, "");
 		if (status != SGX_SUCCESS) {
 			std::cerr << "duk_enclave_emit_message failed" << std::endl;
 			exit(status);
