@@ -83,7 +83,7 @@
     <ClInclude Include="scripts.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="scripts.cpp" />
+    <ClCompile Include="scripts-table.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="framework.js" />
