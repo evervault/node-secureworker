@@ -100,7 +100,6 @@
       <Optimization>Disabled</Optimization>
       <WarningLevel>Level3</WarningLevel>
       <AdditionalIncludeDirectories>$(SolutionDir)duktape-1.4.0\src-separate;$(SolutionDir)scripts;$(SGXSDKInstallPath)include;$(SGXSDKInstallPath)include\tlibc;$(SGXSDKInstallPath)include\stlport;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <AdditionalDependencies>sgx_trts.lib;sgx_tstdc.lib;sgx_tservice.lib;sgx_tcrypto_opt.lib;sgx_tstdcxx.lib</AdditionalDependencies>
@@ -109,7 +108,6 @@
       <EntryPointSymbol />
       <NoEntryPoint>true</NoEntryPoint>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
     <PostBuildEvent>
       <Command>"$(SGXSDKInstallPath)bin\win32\release\sgx_sign.exe" sign -key "$(ProjectDir)duk_enclave_private.pem" -enclave "$(OutDir)duk_enclave.dll" -out "$(OutDir)duk_enclave.signed.dll" -config "$(ProjectDir)duk_enclave.config.xml"</Command>
