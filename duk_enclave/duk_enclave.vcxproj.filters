@@ -29,9 +29,6 @@
     <ClInclude Include="duk_enclave_t.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="scripts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="duk_enclave_private.pem">

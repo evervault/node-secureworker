@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		run.js = run.js
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "scripts", "scripts\scripts.vcxproj", "{7BED0289-2572-4721-B20C-3D9401617BCA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -92,6 +94,18 @@ Global
 		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Simulation|Win32.ActiveCfg = Release|Win32
 		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Simulation|Win32.Build.0 = Release|Win32
 		{EDF57321-8C51-4F46-9F66-616F09921BB1}.Simulation|x64.ActiveCfg = Release|Win32
+		{7BED0289-2572-4721-B20C-3D9401617BCA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7BED0289-2572-4721-B20C-3D9401617BCA}.Debug|Win32.Build.0 = Debug|Win32
+		{7BED0289-2572-4721-B20C-3D9401617BCA}.Debug|x64.ActiveCfg = Debug|Win32
+		{7BED0289-2572-4721-B20C-3D9401617BCA}.Prerelease|Win32.ActiveCfg = Release|Win32
+		{7BED0289-2572-4721-B20C-3D9401617BCA}.Prerelease|Win32.Build.0 = Release|Win32
+		{7BED0289-2572-4721-B20C-3D9401617BCA}.Prerelease|x64.ActiveCfg = Release|Win32
+		{7BED0289-2572-4721-B20C-3D9401617BCA}.Release|Win32.ActiveCfg = Release|Win32
+		{7BED0289-2572-4721-B20C-3D9401617BCA}.Release|Win32.Build.0 = Release|Win32
+		{7BED0289-2572-4721-B20C-3D9401617BCA}.Release|x64.ActiveCfg = Release|Win32
+		{7BED0289-2572-4721-B20C-3D9401617BCA}.Simulation|Win32.ActiveCfg = Release|Win32
+		{7BED0289-2572-4721-B20C-3D9401617BCA}.Simulation|Win32.Build.0 = Release|Win32
+		{7BED0289-2572-4721-B20C-3D9401617BCA}.Simulation|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
