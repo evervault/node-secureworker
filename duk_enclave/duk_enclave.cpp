@@ -40,7 +40,7 @@ static duk_ret_t native_import_script(duk_context *ctx) {
 	if (!duk_is_number(ctx, 0)) return DUK_RET_TYPE_ERROR;
 	const int key = duk_get_int(ctx, 0);
 	if (key < 0 || key >= MAX_SCRIPT) return DUK_RET_RANGE_ERROR;
-	duk_eval_string_noresult(ctx, SCRIPTS[key]);
+	duk_eval_lstring_noresult(ctx, SCRIPTS[key].start, SCRIPTS[key].size);
 	return 0;
 }
 
@@ -386,7 +386,7 @@ void duk_enclave_init(int key) {
 	duk_push_object(ctx);
 	duk_put_global_string(ctx, "_dukEnclaveHandlers");
 	// Application code
-	duk_eval_string_noresult(ctx, SCRIPTS[key]);
+	duk_eval_lstring_noresult(ctx, SCRIPTS[key].start, SCRIPTS[key].size);
 	spin_microtasks(ctx);
 }
 

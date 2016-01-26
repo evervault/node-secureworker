@@ -99,7 +99,8 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)duktape-1.4.0\src-separate;$(SGXSDKInstallPath)include;$(SGXSDKInstallPath)include\tlibc;$(SGXSDKInstallPath)include\stlport;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)duktape-1.4.0\src-separate;$(SolutionDir)scripts;$(SGXSDKInstallPath)include;$(SGXSDKInstallPath)include\tlibc;$(SGXSDKInstallPath)include\stlport;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <AdditionalDependencies>sgx_trts.lib;sgx_tstdc.lib;sgx_tservice.lib;sgx_tcrypto_opt.lib;sgx_tstdcxx.lib</AdditionalDependencies>
@@ -108,6 +109,7 @@
       <EntryPointSymbol />
       <NoEntryPoint>true</NoEntryPoint>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </Link>
     <PostBuildEvent>
       <Command>"$(SGXSDKInstallPath)bin\win32\release\sgx_sign.exe" sign -key "$(ProjectDir)duk_enclave_private.pem" -enclave "$(OutDir)duk_enclave.dll" -out "$(OutDir)duk_enclave.signed.dll" -config "$(ProjectDir)duk_enclave.config.xml"</Command>
@@ -189,7 +191,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="duk_enclave_t.h" />
-    <ClInclude Include="scripts.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="duk_enclave.edl">
@@ -221,6 +222,9 @@
   <ItemGroup>
     <ProjectReference Include="..\duktape-1.4.0\duktape.vcxproj">
       <Project>{ffdb79e5-4146-44eb-9a87-d04f188bb5cb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\scripts\scripts.vcxproj">
+      <Project>{7bed0289-2572-4721-b20c-3d9401617bca}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
