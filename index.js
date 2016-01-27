@@ -65,9 +65,7 @@ SecureWorker._sandboxContext = function _sandboxContext(secureWorker) {
   var sandbox = {
     // Our internal trusted API.
     F: {
-      ready: new Promise(function (resolve, reject) {
-        resolve();
-      }),
+      ready: Promise.resolve(),
       onMessage: function onMessage(listener) {
         secureWorker._eventsFromOutside.addListener('message', listener);
 
