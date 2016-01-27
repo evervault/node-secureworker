@@ -66,26 +66,28 @@ SecureWorker._sandboxContext = function _sandboxContext(secureWorker) {
     // Our internal trusted API.
     F: {
       ready: Promise.resolve(),
+
       onMessage: function onMessage(listener) {
         secureWorker._eventsFromOutside.addListener('message', listener);
 
         return listener;
       },
+
       removeOnMessage: function removeOnMessage(listener) {
         secureWorker._eventsFromOutside.removeListener('message', listener);
       },
+
       postMessage: function postMessage(message) {
         // We want to simulate asynchronous messaging.
         setImmediate(function () {
           secureWorker._eventsFromInside.emit('message', message);
         });
       },
+
       close: function close() {
         secureWorker.terminate();
       },
-      getAppSecret: function getAppSecret() {
-        return secureWorker.constructor._appSecret();
-      },
+
       importScripts: function importScripts(/* args */) {
         for (var i = 0; i < arguments.length; i++) {
           var contentKey = arguments[i];
@@ -99,12 +101,10 @@ SecureWorker._sandboxContext = function _sandboxContext(secureWorker) {
       }
     }
   };
-  sandbox.self = sandbox;
-  return sandbox;
-};
 
-SecureWorker._appSecret = function _appSecret() {
-  throw new Error("Not implemented.");
+  sandbox.self = sandbox;
+
+  return sandbox;
 };
 
 module.exports = SecureWorker;
