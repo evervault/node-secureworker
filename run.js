@@ -1,6 +1,7 @@
-var SecureWorkerInternal = require('./Release/secureworker_internal');
+// TODO: Figure out the configuration??
+var SecureWorkerInternal = require('./Debug/secureworker_internal');
 
-var w = new SecureWorkerInternal('./Debug/duk_enclave.signed.dll');
+var w = new SecureWorkerInternal('./duk_enclave.signed.dll');
 w.handlePostMessage = function (message) {
     console.log('from w:', message);
 };
