@@ -24,7 +24,7 @@ int _tmain(int argc, _TCHAR* argv[]) {
 		}
 	}
 	{
-		const sgx_status_t status = duk_enclave_init(enclave_id, 0);
+		const sgx_status_t status = duk_enclave_init(enclave_id, "main.js");
 		if (status != SGX_SUCCESS) {
 			std::cerr << "duk_enclave_init failed" << std::endl;
 			exit(status);

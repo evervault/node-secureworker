@@ -3,25 +3,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <DebuggerFlavor>SGXDebugLauncher</DebuggerFlavor>
     <IntelSGXDebuggerCommand>$(LOCALAPPDATA)\.meteor\packages\meteor-tool\1.1.10\mt-os.windows.x86_32\dev_bundle\bin\node.exe</IntelSGXDebuggerCommand>
-    <IntelSGXDebuggerCommandArguments>run.js</IntelSGXDebuggerCommandArguments>
-    <IntelSGXDebuggerWorkingDirectory>$(OutDir)</IntelSGXDebuggerWorkingDirectory>
+    <IntelSGXDebuggerCommandArguments>run.js $(Configuration)</IntelSGXDebuggerCommandArguments>
+    <IntelSGXDebuggerWorkingDirectory>$(SolutionDir)</IntelSGXDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <DebuggerFlavor>SGXDebugLauncher</DebuggerFlavor>
     <IntelSGXDebuggerCommand>$(LOCALAPPDATA)\.meteor\packages\meteor-tool\1.1.10\mt-os.windows.x86_32\dev_bundle\bin\node.exe</IntelSGXDebuggerCommand>
-    <IntelSGXDebuggerCommandArguments>run.js</IntelSGXDebuggerCommandArguments>
-    <IntelSGXDebuggerWorkingDirectory>$(OutDir)</IntelSGXDebuggerWorkingDirectory>
+    <IntelSGXDebuggerCommandArguments>run.js $(Configuration)</IntelSGXDebuggerCommandArguments>
+    <IntelSGXDebuggerWorkingDirectory>$(SolutionDir)</IntelSGXDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Prerelease|Win32'">
     <DebuggerFlavor>SGXDebugLauncher</DebuggerFlavor>
     <IntelSGXDebuggerCommand>$(LOCALAPPDATA)\.meteor\packages\meteor-tool\1.1.10\mt-os.windows.x86_32\dev_bundle\bin\node.exe</IntelSGXDebuggerCommand>
-    <IntelSGXDebuggerCommandArguments>run.js</IntelSGXDebuggerCommandArguments>
-    <IntelSGXDebuggerWorkingDirectory>$(OutDir)</IntelSGXDebuggerWorkingDirectory>
+    <IntelSGXDebuggerCommandArguments>run.js $(Configuration)</IntelSGXDebuggerCommandArguments>
+    <IntelSGXDebuggerWorkingDirectory>$(SolutionDir)</IntelSGXDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Simulation|Win32'">
     <DebuggerFlavor>SGXDebugLauncher</DebuggerFlavor>
     <IntelSGXDebuggerCommand>$(LOCALAPPDATA)\.meteor\packages\meteor-tool\1.1.10\mt-os.windows.x86_32\dev_bundle\bin\node.exe</IntelSGXDebuggerCommand>
-    <IntelSGXDebuggerCommandArguments>run.js</IntelSGXDebuggerCommandArguments>
-    <IntelSGXDebuggerWorkingDirectory>$(OutDir)</IntelSGXDebuggerWorkingDirectory>
+    <IntelSGXDebuggerCommandArguments>run.js $(Configuration)</IntelSGXDebuggerCommandArguments>
+    <IntelSGXDebuggerWorkingDirectory>$(SolutionDir)</IntelSGXDebuggerWorkingDirectory>
   </PropertyGroup>
 </Project>

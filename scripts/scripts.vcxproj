@@ -38,7 +38,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <CustomBuildBeforeTargets>Lib</CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <CustomBuildBeforeTargets>Lib</CustomBuildBeforeTargets>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -63,6 +68,7 @@
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>scripts-binary.lib</Outputs>
+      <Inputs>*.js</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -82,6 +88,7 @@
       <Command>C:\MinGW\bin\ld.exe -r -b binary -o $(OutDir)scripts-binary.lib *.js</Command>
       <Message>Linking Scripts</Message>
       <Outputs>scripts-binary.lib</Outputs>
+      <Inputs>*.js</Inputs>
     </CustomBuildStep>
     <Lib>
       <AdditionalDependencies>$(OutDir)scripts-binary.lib</AdditionalDependencies>

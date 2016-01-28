@@ -48,7 +48,7 @@ public:
 	sgx_enclave_id_t enclave_id;
 	explicit SecureWorkerInternal(const char *file_name);
 	~SecureWorkerInternal();
-	void init(int key);
+	void init(const char *key);
 	void close();
 	void emitMessage(const char *message);
 	static v8::Handle<v8::Value> New(const v8::Arguments &arguments);
@@ -76,7 +76,7 @@ SecureWorkerInternal::~SecureWorkerInternal() {
 	enclave_id = 0;
 }
 
-void SecureWorkerInternal::init(int key) {
+void SecureWorkerInternal::init(const char *key) {
 	{
 		const sgx_status_t status = duk_enclave_init(enclave_id, key);
 		if (status != SGX_SUCCESS) throw sgx_error(status, "duk_enclave_init");
@@ -124,15 +124,16 @@ v8::Handle<v8::Value> SecureWorkerInternal::New(const v8::Arguments &arguments) 
 
 v8::Handle<v8::Value> SecureWorkerInternal::Init(const v8::Arguments &arguments) {
 	v8::HandleScope scope;
-	if (!arguments[0]->IsNumber()) {
+
+	if (!arguments[0]->IsString()) {
 		v8::ThrowException(v8::Exception::TypeError(v8::String::New("Argument error")));
 		return scope.Close(v8::Undefined());
 	}
-	int key = static_cast<int>(arguments[0]->NumberValue());
+	v8::String::Utf8Value arg0_utf8(arguments[0]);
 	SecureWorkerInternal *secure_worker_internal = node::ObjectWrap::Unwrap<SecureWorkerInternal>(arguments.This());
 	try {
 		entry_info entry(arguments.This());
-		secure_worker_internal->init(key);
+		secure_worker_internal->init(*arg0_utf8);
 	} catch (sgx_error error) {
 		error.rethrow();
 		return scope.Close(v8::Undefined());
