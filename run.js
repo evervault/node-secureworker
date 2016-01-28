@@ -1,11 +1,12 @@
-// TODO: Figure out the configuration??
-var SecureWorkerInternal = require('./Debug/secureworker_internal');
+var configuration = process.argv[2] || 'Debug';
 
-var w = new SecureWorkerInternal('./duk_enclave.signed.dll');
+var SecureWorkerInternal = require('./' + configuration + '/secureworker_internal');
+
+var w = new SecureWorkerInternal('./' + configuration + '/duk_enclave.signed.dll');
 w.handlePostMessage = function (message) {
     console.log('from w:', message);
 };
-w.init(0);
+w.init('main.js');
 w.emitMessage('abc');
 w.emitMessage('');
 w.close();

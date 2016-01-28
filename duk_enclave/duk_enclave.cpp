@@ -15,6 +15,13 @@ void *get_buffer_data_notnull(duk_context *ctx, duk_idx_t index, duk_size_t *out
 	}
 }
 
+const duk_enclave_script_t *look_up_script(const char *key) {
+	for (size_t i = 0; i < MAX_SCRIPT; i++) {
+		if (!strcmp(key, SCRIPTS[i].key)) return &SCRIPTS[i];
+	}
+	return NULL;
+}
+
 static duk_ret_t native_post_message(duk_context *ctx) {
 	const char * const message = duk_get_string(ctx, 0);
 	if (message == NULL) return DUK_RET_TYPE_ERROR;
@@ -37,10 +44,11 @@ static duk_ret_t native_next_tick(duk_context *ctx) {
 }
 
 static duk_ret_t native_import_script(duk_context *ctx) {
-	if (!duk_is_number(ctx, 0)) return DUK_RET_TYPE_ERROR;
-	const int key = duk_get_int(ctx, 0);
-	if (key < 0 || key >= MAX_SCRIPT) return DUK_RET_RANGE_ERROR;
-	duk_eval_lstring_noresult(ctx, SCRIPTS[key].start, SCRIPTS[key].size);
+	const char * const key = duk_get_string(ctx, 0);
+	if (key == NULL) return DUK_RET_TYPE_ERROR;
+	const duk_enclave_script_t *script = look_up_script(key);
+	if (script == NULL) return DUK_RET_ERROR;
+	duk_eval_lstring_noresult(ctx, script->start, script->size);
 	return 0;
 }
 
@@ -370,9 +378,11 @@ static void spin_microtasks(duk_context *ctx) {
 
 static duk_context *ctx = NULL;
 
-void duk_enclave_init(int key) {
+void duk_enclave_init(const char *key) {
 	if (ctx != NULL) abort();
-	if (key < 0 || key >= MAX_SCRIPT) abort();
+	if (key == NULL) abort();
+	const duk_enclave_script_t *script = look_up_script(key);
+	if (script == NULL) abort();
 	ctx = duk_create_heap_default();
 	if (ctx == NULL) abort();
 	// Framework code
@@ -386,7 +396,7 @@ void duk_enclave_init(int key) {
 	duk_push_object(ctx);
 	duk_put_global_string(ctx, "_dukEnclaveHandlers");
 	// Application code
-	duk_eval_lstring_noresult(ctx, SCRIPTS[key].start, SCRIPTS[key].size);
+	duk_eval_lstring_noresult(ctx, script->start, script->size);
 	spin_microtasks(ctx);
 }
 
