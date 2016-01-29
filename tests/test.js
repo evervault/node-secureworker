@@ -1,8 +1,4 @@
-var SecureWorker = require('./index');
-
-SecureWorker._appSecret = function _appSecret() {
-  return 'foobar';
-};
+var SecureWorker = require('../lib/index');
 
 function worker() {
   F.onMessage(function (message) {
