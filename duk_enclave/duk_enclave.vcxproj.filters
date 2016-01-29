@@ -41,9 +41,6 @@
     </Xml>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuild Include="duk_enclave.edl">
       <Filter>Source Files</Filter>
     </CustomBuild>
