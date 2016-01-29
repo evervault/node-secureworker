@@ -1,16 +1,34 @@
 var events = require('events');
-var m = require('m');
-exports.postMessage = function (message) {
-	setImmediate(function () {
-		m._native.emitMessage(message);
-	});
+var SecureWorkerInternal = require('secureworker_internal');
+var SecureWorker = function (key) {
+  var self = this;
+  self._events = new events.EventEmitter();
+  self._internal = new SecureWorkerInternal('duk_enclave.signed.dll');
+  self._internal.handlePostMessage = function (marshalledMessage) {
+    var message = JSON.parse(marshalledMessage);
+    setImmediate(function () {
+      self._events.emit('message', message);
+    });
+  };
+  self._internal.init(key);
+}
+SecureWorker.prototype.onMessage = function (listener) {
+  this._events.addListener('message', listener);
 };
-var messageEmitter = new events.EventEmitter();
-exports.onMessage = function (callback) {
-	messageEmitter.addListener('message', callback);
+SecureWorker.prototype.removeOnMessage = function (listener) {
+  this._events.removeListener('message', listener);
 };
-m._handlers.postMessage = function (message) {
-	setImmediate(function () {
-		messageEmitter.emit('message', message);
-	});
+SecureWorker.prototype.postMessage = function (message) {
+  var marshalledMessage = JSON.stringify(message);
+  setImmediate(function () {
+    self._internal.postMessage(marshalledMessage)
+  });
 };
+SecureWorker.prototype.terminate = function () {
+  var self = this;
+  setImmediate(function () {
+    self._internal.close();
+    self._internal = null;
+  });
+};
+exports = SecureWorker;
