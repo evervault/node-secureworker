@@ -118,7 +118,7 @@
       <Message>sign the enclave</Message>
     </PostBuildEvent>
     <CustomBuildStep>
-      <Command>7z a "$(OutDir)duk_enclave_builder.zip" ".\duk_enclave.config.xml" ".\$(Configuration)\duk_enclave.obj" ".\$(Configuration)\duk_enclave_t.obj" "$(OutDir)duktape-dist.lib" "$(SolutionDir)scripts\scripts.h" "$(SolutionDir)dist-files\build_enclave.bat"</Command>
+      <Command>del "$(OutDir)duk_enclave_builder.zip" &amp;&amp; 7z a "$(OutDir)duk_enclave_builder.zip" ".\duk_enclave.config.xml" ".\$(Configuration)\duk_enclave.obj" ".\$(Configuration)\duk_enclave_t.obj" "$(OutDir)duktape-dist.lib" "$(SolutionDir)scripts\scripts.h" "$(SolutionDir)dist-files\build_enclave.bat"</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Zipping Release</Message>
@@ -147,7 +147,7 @@
       <Message>sign the enclave</Message>
     </PostBuildEvent>
     <CustomBuildStep>
-      <Command>7z a "$(OutDir)duk_enclave_builder.zip" ".\duk_enclave.config.xml" ".\$(Configuration)\duk_enclave.obj" ".\$(Configuration)\duk_enclave_t.obj" "$(OutDir)duktape-dist.lib" "$(SolutionDir)scripts\scripts.h" "$(SolutionDir)dist-files\build_enclave.bat"</Command>
+      <Command>del "$(OutDir)duk_enclave_builder.zip" &amp;&amp; 7z a "$(OutDir)duk_enclave_builder.zip" ".\duk_enclave.config.xml" ".\$(Configuration)\duk_enclave.obj" ".\$(Configuration)\duk_enclave_t.obj" "$(OutDir)duktape-dist.lib" "$(SolutionDir)scripts\scripts.h" "$(SolutionDir)dist-files\build_enclave.bat"</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Zipping Release</Message>
@@ -177,7 +177,7 @@
       <Message>generate the enclave signing material</Message>
     </PostBuildEvent>
     <CustomBuildStep>
-      <Command>7z a "$(OutDir)duk_enclave_builder.zip" ".\duk_enclave.config.xml" ".\$(Configuration)\duk_enclave.obj" ".\$(Configuration)\duk_enclave_t.obj" "$(OutDir)duktape-dist.lib" "$(SolutionDir)scripts\scripts.h" "$(SolutionDir)dist-files\build_enclave.bat"</Command>
+      <Command>del "$(OutDir)duk_enclave_builder.zip" &amp;&amp; 7z a "$(OutDir)duk_enclave_builder.zip" ".\duk_enclave.config.xml" ".\$(Configuration)\duk_enclave.obj" ".\$(Configuration)\duk_enclave_t.obj" "$(OutDir)duktape-dist.lib" "$(SolutionDir)scripts\scripts.h" "$(SolutionDir)dist-files\build_enclave.bat"</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Zipping Release</Message>
@@ -208,7 +208,7 @@
       <Message>sign the enclave</Message>
     </PostBuildEvent>
     <CustomBuildStep>
-      <Command>7z a "$(OutDir)duk_enclave_builder.zip" ".\duk_enclave.config.xml" ".\$(Configuration)\duk_enclave.obj" ".\$(Configuration)\duk_enclave_t.obj" "$(OutDir)duktape-dist.lib" "$(SolutionDir)scripts\scripts.h" "$(SolutionDir)dist-files\build_enclave.bat"</Command>
+      <Command>del "$(OutDir)duk_enclave_builder.zip" &amp;&amp; 7z a "$(OutDir)duk_enclave_builder.zip" ".\duk_enclave.config.xml" ".\$(Configuration)\duk_enclave.obj" ".\$(Configuration)\duk_enclave_t.obj" "$(OutDir)duktape-dist.lib" "$(SolutionDir)scripts\scripts.h" "$(SolutionDir)dist-files\build_enclave.bat"</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Zipping Release</Message>
