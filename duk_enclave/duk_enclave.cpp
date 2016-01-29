@@ -52,6 +52,19 @@ static duk_ret_t native_import_script(duk_context *ctx) {
 	return 0;
 }
 
+static duk_ret_t native_get_random_values(duk_context *ctx) {
+	duk_size_t array_size;
+	void * const array = duk_get_buffer_data(ctx, 0, &array_size);
+	{
+		const sgx_status_t status = sgx_read_rand(
+			reinterpret_cast<unsigned char *>(array), array_size
+		);
+		if (status == SGX_ERROR_INVALID_PARAMETER) return DUK_RET_ERROR;
+		if (status != SGX_SUCCESS) abort();
+	}
+	return 1;
+}
+
 // AES-256.
 
 static duk_ret_t native_sha256_digest(duk_context *ctx) {
@@ -155,9 +168,9 @@ static duk_ret_t native_aescmac_sign(duk_context *ctx) {
 // AES-CTR. only 128-bit keys
 
 static duk_ret_t native_aesctr_encrypt(duk_context *ctx) {
-	duk_small_int_t length = duk_get_int(ctx, 0);
 	duk_size_t counter_size;
-	const void * const counter = duk_get_buffer_data(ctx, 1, &counter_size);
+	const void * const counter = duk_get_buffer_data(ctx, 0, &counter_size);
+	duk_small_int_t length = duk_get_int(ctx, 1);
 	duk_size_t key_size;
 	const void * const key = duk_get_buffer_data(ctx, 2, &key_size);
 	duk_size_t data_size;
@@ -347,6 +360,7 @@ static const duk_function_list_entry native_methods[] = {
 	{"postMessage", native_post_message, 1},
 	{"nextTick", native_next_tick, 1},
 	{"importScript", native_import_script, 1},
+	{"getRandomValues", native_get_random_values, 1},
 	{"sha256Digest", native_sha256_digest, 1},
 	{"aesgcmEncrypt", native_aesgcm_encrypt, 4},
 	{"aesgcmDecrypt", native_aesgcm_decrypt, 4},
