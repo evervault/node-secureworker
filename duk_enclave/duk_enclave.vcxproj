@@ -215,9 +215,6 @@
     <Xml Include="duk_enclave.config.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\duktape-1.4.0\duktape.vcxproj">
       <Project>{ffdb79e5-4146-44eb-9a87-d04f188bb5cb}</Project>
     </ProjectReference>
