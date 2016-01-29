@@ -61,14 +61,13 @@
     </Lib>
     <CustomBuildStep />
     <CustomBuildStep>
-      <Command>C:\MinGW\bin\ld.exe -r -b binary -o $(OutDir)scripts-binary.lib *.js</Command>
+      <Command>"C:\MinGW\bin\ld.exe" -r -b binary -o "$(OutDir)scripts-binary.lib" *.js</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Message>Linking Scripts</Message>
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>scripts-binary.lib</Outputs>
-      <Inputs>*.js</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -85,10 +84,9 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <CustomBuildStep>
-      <Command>C:\MinGW\bin\ld.exe -r -b binary -o $(OutDir)scripts-binary.lib *.js</Command>
+      <Command>"C:\MinGW\bin\ld.exe" -r -b binary -o "$(OutDir)scripts-binary.lib" *.js</Command>
       <Message>Linking Scripts</Message>
       <Outputs>scripts-binary.lib</Outputs>
-      <Inputs>*.js</Inputs>
     </CustomBuildStep>
     <Lib>
       <AdditionalDependencies>$(OutDir)scripts-binary.lib</AdditionalDependencies>
