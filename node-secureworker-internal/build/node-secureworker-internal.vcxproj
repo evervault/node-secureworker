@@ -56,6 +56,18 @@
     <TargetName>secureworker_internal</TargetName>
     <TargetPath>$(OutDir)\$(ProjectName).node</TargetPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Simulation|Win32'">
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Prerelease|Win32'">
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SGXSDKInstallPath)\include;$(USERPROFILE)\.node-gyp\0.10.40\src;$(USERPROFILE)\.node-gyp\0.10.40\deps\uv\include;$(USERPROFILE)\.node-gyp\0.10.40\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -88,6 +100,15 @@
       <AdditionalIncludeDirectories>$(USERPROFILE)\.node-gyp\0.10.40\src;$(USERPROFILE)\.node-gyp\0.10.40\deps\uv\include;$(USERPROFILE)\.node-gyp\0.10.40\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;BUILDING_V8_SHARED=1;BUILDING_UV_SHARED=1;BUILDING_NODE_EXTENSION;DEBUG;_DEBUG;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
+    <CustomBuildStep>
+      <Command>del "$(OutDir)secureworker-v0.0.1.tar" &amp;&amp; 7z a "$(OutDir)secureworker-v0.0.1.tar" "$(OutDir)secureworker_internal.node" &amp;&amp; del "$(OutDir)secureworker-v0.0.1.tar.gz" &amp;&amp; 7z a "$(OutDir)secureworker-v0.0.1.tar.gz" "$(OutDir)secureworker-v0.0.1.tar"</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Packing Release</Message>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>secureworker-v0.0.1.tar.gz</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Simulation|Win32'">
     <ClCompile>
@@ -121,6 +142,15 @@
       <AdditionalIncludeDirectories>$(USERPROFILE)\.node-gyp\0.10.40\src;$(USERPROFILE)\.node-gyp\0.10.40\deps\uv\include;$(USERPROFILE)\.node-gyp\0.10.40\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;BUILDING_V8_SHARED=1;BUILDING_UV_SHARED=1;BUILDING_NODE_EXTENSION;DEBUG;_DEBUG;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
+    <CustomBuildStep>
+      <Command>del "$(OutDir)secureworker-v0.0.1.tar" &amp;&amp; 7z a "$(OutDir)secureworker-v0.0.1.tar" "$(OutDir)secureworker_internal.node" &amp;&amp; del "$(OutDir)secureworker-v0.0.1.tar.gz" &amp;&amp; 7z a "$(OutDir)secureworker-v0.0.1.tar.gz" "$(OutDir)secureworker-v0.0.1.tar"</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Packing Release</Message>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>secureworker-v0.0.1.tar.gz</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -166,6 +196,15 @@
       <AdditionalIncludeDirectories>$(USERPROFILE)\.node-gyp\0.10.40\src;$(USERPROFILE)\.node-gyp\0.10.40\deps\uv\include;$(USERPROFILE)\.node-gyp\0.10.40\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;BUILDING_V8_SHARED=1;BUILDING_UV_SHARED=1;BUILDING_NODE_EXTENSION;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
+    <CustomBuildStep>
+      <Command>del "$(OutDir)secureworker-v0.0.1.tar" &amp;&amp; 7z a "$(OutDir)secureworker-v0.0.1.tar" "$(OutDir)secureworker_internal.node" &amp;&amp; del "$(OutDir)secureworker-v0.0.1.tar.gz" &amp;&amp; 7z a "$(OutDir)secureworker-v0.0.1.tar.gz" "$(OutDir)secureworker-v0.0.1.tar"</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Packing Release</Message>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>secureworker-v0.0.1.tar.gz</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Prerelease|Win32'">
     <ClCompile>
@@ -210,6 +249,15 @@
       <AdditionalIncludeDirectories>$(USERPROFILE)\.node-gyp\0.10.40\src;$(USERPROFILE)\.node-gyp\0.10.40\deps\uv\include;$(USERPROFILE)\.node-gyp\0.10.40\deps\v8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;BUILDING_V8_SHARED=1;BUILDING_UV_SHARED=1;BUILDING_NODE_EXTENSION;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
+    <CustomBuildStep>
+      <Command>del "$(OutDir)secureworker-v0.0.1.tar" &amp;&amp; 7z a "$(OutDir)secureworker-v0.0.1.tar" "$(OutDir)secureworker_internal.node" &amp;&amp; del "$(OutDir)secureworker-v0.0.1.tar.gz" &amp;&amp; 7z a "$(OutDir)secureworker-v0.0.1.tar.gz" "$(OutDir)secureworker-v0.0.1.tar"</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Packing Release</Message>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>secureworker-v0.0.1.tar.gz</Outputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\duk_enclave\duk_enclave.edl">
