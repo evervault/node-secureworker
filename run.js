@@ -7,6 +7,6 @@ w.handlePostMessage = function (message) {
     console.log('from w:', message);
 };
 w.init('main.js');
-w.emitMessage('abc');
-w.emitMessage('');
+w.emitMessage('"abc"');
+w.emitMessage('""');
 w.close();
