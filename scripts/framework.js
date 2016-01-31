@@ -1,2 +1,2 @@
 var F = {};
-_dukEnclaveNative.postMessage('hello from framework');
+_dukEnclaveNative.postMessage('"hello from framework"');
