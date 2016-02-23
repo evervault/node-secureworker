@@ -40,23 +40,25 @@ void throw_sgx_status(duk_context *ctx, sgx_status_t status, const char *source)
 	duk_throw(ctx);
 }
 
+void output_debug_line(const char *line) {
+	OutputDebugString(const_cast<char *>(line));
+	OutputDebugString("\n");
+}
+
 void report_error(duk_context *ctx) {
 	if (duk_is_error(ctx, -1)) {
 		duk_get_prop_string(ctx, -1, "stack");
 		const char * const message = duk_safe_to_string(ctx, -1);
-		OutputDebugString(const_cast<char *>(message));
-		OutputDebugString("\n");
+		output_debug_line(message);
 		duk_pop(ctx);
 	} else {
 		const char * const message = duk_safe_to_string(ctx, -1);
-		OutputDebugString(const_cast<char *>(message));
-		OutputDebugString("\n");
+		output_debug_line(message);
 	}
 }
 
 void report_fatal(duk_context *ctx, duk_errcode_t code, const char *msg) {
-	OutputDebugString(const_cast<char *>(msg));
-	OutputDebugString("\n");
+	output_debug_line(msg);
 	abort();
 }
 
@@ -91,6 +93,13 @@ static duk_ret_t native_import_script(duk_context *ctx) {
 	if (result != DUK_EXEC_SUCCESS) duk_throw(ctx);
 	return 0;
 }
+
+static duk_ret_t native_debug(duk_context *ctx) {
+	const char * const arg = duk_safe_to_string(ctx, 0);
+	output_debug_line(arg);
+	return 0;
+}
+
 
 static duk_ret_t native_get_random_values(duk_context *ctx) {
 	duk_size_t array_size;
@@ -131,7 +140,7 @@ static duk_ret_t native_aesgcm_encrypt(duk_context *ctx) {
 	duk_size_t key_size;
 	const void * const key = duk_get_buffer_data(ctx, 2, &key_size);
 	duk_size_t data_size;
-	const void * const data = duk_get_buffer_data(ctx, 3, &data_size);
+	const void * const data = get_buffer_data_notnull(ctx, 3, &data_size);
 	if (key_size != sizeof(sgx_aes_gcm_128bit_key_t)) return DUK_RET_ERROR;
 	const duk_size_t out_size = data_size + sizeof(sgx_aes_gcm_128bit_tag_t);
 	void * const out = duk_push_fixed_buffer(ctx, out_size);
@@ -159,7 +168,7 @@ static duk_ret_t native_aesgcm_decrypt(duk_context *ctx) {
 	duk_size_t key_size;
 	const void * const key = duk_get_buffer_data(ctx, 2, &key_size);
 	duk_size_t data_size;
-	const void * const data = duk_get_buffer_data(ctx, 3, &data_size);
+	const void * const data = get_buffer_data_notnull(ctx, 3, &data_size);
 	if (key_size != sizeof(sgx_aes_gcm_128bit_key_t) || data_size < sizeof(sgx_aes_gcm_128bit_tag_t)) return DUK_RET_ERROR;
 	const duk_size_t out_size = data_size - sizeof(sgx_aes_gcm_128bit_tag_t);
 	void * const out = duk_push_fixed_buffer(ctx, out_size);
@@ -185,7 +194,7 @@ static duk_ret_t native_aescmac_sign(duk_context *ctx) {
 	duk_size_t key_size;
 	void * const key = duk_get_buffer_data(ctx, 0, &key_size);
 	duk_size_t data_size;
-	const void * const data = duk_get_buffer_data(ctx, 1, &data_size);
+	const void * const data = get_buffer_data_notnull(ctx, 1, &data_size);
 	if (key_size != sizeof(sgx_cmac_128bit_key_t)) return DUK_RET_ERROR;
 	void * const out = duk_push_fixed_buffer(ctx, sizeof(sgx_cmac_128bit_tag_t));
 	{
@@ -209,7 +218,7 @@ static duk_ret_t native_aesctr_encrypt(duk_context *ctx) {
 	duk_size_t key_size;
 	const void * const key = duk_get_buffer_data(ctx, 2, &key_size);
 	duk_size_t data_size;
-	const void * const data = duk_get_buffer_data(ctx, 3, &data_size);
+	const void * const data = get_buffer_data_notnull(ctx, 3, &data_size);
 	if (counter_size != 16 || key_size != sizeof(sgx_aes_ctr_128bit_key_t)) return DUK_RET_ERROR;
 	uint8_t counter_scratch[16];
 	memcpy(counter_scratch, counter, 16);
@@ -235,7 +244,7 @@ static duk_ret_t native_aesctr_decrypt(duk_context *ctx) {
 	duk_size_t key_size;
 	const void * const key = duk_get_buffer_data(ctx, 2, &key_size);
 	duk_size_t data_size;
-	const void * const data = duk_get_buffer_data(ctx, 3, &data_size);
+	const void * const data = get_buffer_data_notnull(ctx, 3, &data_size);
 	if (counter_size != 16 || key_size != sizeof(sgx_aes_ctr_128bit_key_t)) return DUK_RET_ERROR;
 	uint8_t counter_scratch[16];
 	memcpy(counter_scratch, counter, 16);
@@ -322,7 +331,7 @@ static duk_ret_t native_ecdsa_sign(duk_context *ctx) {
 	duk_size_t key_size;
 	void * const key = duk_get_buffer_data(ctx, 0, &key_size);
 	duk_size_t data_size;
-	const void * const data = duk_get_buffer_data(ctx, 1, &data_size);
+	const void * const data = get_buffer_data_notnull(ctx, 1, &data_size);
 	if (key_size != sizeof(sgx_ec256_private_t)) return DUK_RET_ERROR;
 	void * const out = duk_push_fixed_buffer(ctx, sizeof(sgx_ec256_signature_t));
 	sgx_ecc_state_handle_t ecc_handle;
@@ -353,7 +362,7 @@ static duk_ret_t native_ecdsa_verify(duk_context *ctx) {
 	duk_size_t signature_size;
 	void * const signature = duk_get_buffer_data(ctx, 1, &signature_size);
 	duk_size_t data_size;
-	const void * const data = duk_get_buffer_data(ctx, 2, &data_size);
+	const void * const data = get_buffer_data_notnull(ctx, 2, &data_size);
 	if (key_size != sizeof(sgx_ec256_private_t) || signature_size != sizeof(sgx_ec256_signature_t)) return DUK_RET_ERROR;
 	uint8_t out;
 	sgx_ecc_state_handle_t ecc_handle;
@@ -385,6 +394,7 @@ static const duk_function_list_entry native_methods[] = {
 	{"postMessage", native_post_message, 1},
 	{"nextTick", native_next_tick, 1},
 	{"importScript", native_import_script, 1},
+	{"debug", native_debug, 1},
 	{"getRandomValues", native_get_random_values, 1},
 	{"sha256Digest", native_sha256_digest, 1},
 	{"aesgcmEncrypt", native_aesgcm_encrypt, 4},
