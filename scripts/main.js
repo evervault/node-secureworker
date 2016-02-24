@@ -1,10 +1,9 @@
 var setTimeout; // so Promise.js doesn't crash
 _dukEnclaveNative.importScript('Promise.js');
 _dukEnclaveNative.importScript('framework.js');
-//                                                                                  v
-// var rawKeyHex = '20EB8A970AB631E675DAAB60C8796521A6CC2671A2FE1B27D77F43FA0655726B09B4A2398B09942C27FF706C9C8BB9A61E5787A315D6EA843F7886690610DC67';
-   var rawKeyHex = '6B725506FA437FD7271BFEA27126CCA6216579C860ABDA75E631B60A978AEB2067DC10066986783F84EAD615A387571EA6B98B9C6C70FF272C94098B39A2B409';
-var publicKey = crypto.subtle.importKey('raw', Duktape.dec('hex', rawKeyHex), {
+// Test vector from RFC 4754
+var rawKeyHex = '2442A5CC0ECD015FA3CA31DC8E2BBC70BF42D60CBCA20085E0822CB04235E9706FC98BD7E50211A4A27102FA3549DF79EBCB4BF246B80945CDDFE7D509BBFD7D';
+var publicKey = crypto.subtle.importKey('raw-public-uncompressed-be', Duktape.dec('hex', rawKeyHex), {
     name: 'ECDSA',
     namedCurve: 'P-256',
 }, true, ['verify']);
