@@ -41,6 +41,25 @@ var crypto = (function () {
         if (typeof alg === 'string') return { name: alg };
         return alg;
     };
+    var normalizeBufferSource = function (src) {
+        if (typeof src === 'buffer') {
+            return new Uint8Array(src);
+        } else {
+            return new Uint8Array(Duktape.Buffer(src), src.byteOffset, src.byteLength);
+        }
+    };
+    var equals128 = function (a, b) {
+        if (a.byteLength !== 16 || b.byteLength !== 16) return false;
+        for (var i = 0; i < 16; i++) {
+            if (a[i] !== b[i]) return false;
+        }
+        return true;
+    };
+    var reverse256 = function (dst, src) {
+        for (var i = 0; i < 32; i++) {
+            dst[i] = src[31 - i];
+        }
+    };
     var crypto = {
         getRandomValues: function (array) {
             throw new Error('getRandomValues not supported');
@@ -79,7 +98,11 @@ var crypto = (function () {
                     case 'ECDSA':
                         algorithm.hash = normalizeAlgorithmShallow(algorithm.hash);
                         if (algorithm.hash.name !== 'SHA-256') throw new Error('hash ' + algorithm.hash.name + ' not supported');
-                        return Promise.resolve(_dukEnclaveNative.ecdsaSign(key.raw, data));
+                        var signatureLE = _dukEnclaveNative.ecdsaSign(key.raw, data);
+                        var signature = new ArrayBuffer(64);
+                        reverse256(new Uint8Array(signature, 0, 32), new Uint8Array(signatureLE, 0, 32));
+                        reverse256(new Uint8Array(signature, 32, 32), new Uint8Array(signatureLE, 32, 32));
+                        return Promise.resolve(signature);
                     default:
                         throw new Error('algorithm ' + algorithm.name + ' not supported');
                 }
@@ -87,9 +110,17 @@ var crypto = (function () {
             verify: function (algorithm, key, signature, data) {
                 algorithm = normalizeAlgorithmShallow(algorithm);
                 switch (algorithm.name) {
+                    case 'AES-CMAC':
+                        if (algorithm.length !== 128) throw new Error('length ' + algorithm.length + ' not supported');
+                        var expectedSignature = _dukEnclaveNative.aescmacSign(key.raw, data);
+                        return Promise.resolve(equals128(normalizeBufferSource(signature), new Uint8Array(expectedSignature)));
                     case 'ECDSA':
                         algorithm.hash = normalizeAlgorithmShallow(algorithm.hash);
                         if (algorithm.hash.name !== 'SHA-256') throw new Error('hash ' + algorithm.hash.name + ' not supported');
+                        signature = normalizeBufferSource(signature);
+                        var signatureLE = new ArrayBuffer(64);
+                        reverse256(new Uint8Array(signatureLE, 0, 32), new Uint8Array(signature, 0, 32));
+                        reverse256(new Uint8Array(signatureLE, 32, 32), new Uint8Array(signature, 32, 32));
                         return Promise.resolve(_dukEnclaveNative.ecdsaVerify(key.raw, signature, data));
                     default:
                         throw new Error('algorithm ' + algorithm.name + ' not supported');
@@ -153,12 +184,13 @@ var crypto = (function () {
                 // Haaaaaaack. Assume it's a secret key, and guess based on the length for ECDH/ECDSA.
                 algorithm = normalizeAlgorithmShallow(algorithm);
                 var result = {
-                    type: 'secret',
+                    type: null,
                     extractable: true,
                     algorithm: algorithm,
                     usages: keyUsages,
-                    raw: keyData,
+                    raw: null,
                 };
+                // TODO: What with all the endianness conversion, we might as well add the DER stuff.
                 switch (algorithm.name) {
                     case 'ECDH':
                     case 'ECDSA':
@@ -166,17 +198,26 @@ var crypto = (function () {
                         var keyLength = keyData.byteLength || keyData.length;
                         if (keyLength === 64) {
                             result.type = 'public';
+                            result.raw = new ArrayBuffer(64);
+                            reverse256(new Uint8Array(result.raw, 0, 32), new Uint8Array(keyData, 0, 32));
+                            reverse256(new Uint8Array(result.raw, 32, 32), new Uint8Array(keyData, 32, 32));
                         } else if (keyLength === 32) {
                             result.type = 'private';
+                            result.raw = new ArrayBuffer(32);
+                            reverse256(new Uint8Array(result.raw, 0, 32), new Uint8Array(keyData, 0, 32));
                         } else {
                             throw new Error('unrecognized keyData length');
                         }
                         break;
+                    default:
+                        result.type = 'secret';
+                        result.raw = keyData;
                 }
                 return Promise.resolve(result);
             },
             exportKey: function (format, key) {
                 if (format !== 'raw') throw new Error('format ' + format + ' not supported');
+                // TODO: Swap endianness.
                 return Promise.resolve(key.raw);
             },
             wrapKey: function (format, key, wrappingKey, wrapAlgorithm) {
