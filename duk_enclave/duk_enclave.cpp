@@ -7,7 +7,7 @@
 
 #include "scripts.h"
 
-void *get_buffer_data_notnull(duk_context *ctx, duk_idx_t index, duk_size_t *out_size) {
+static void *get_buffer_data_notnull(duk_context *ctx, duk_idx_t index, duk_size_t *out_size) {
 	void * const out = duk_get_buffer_data(ctx, index, out_size);
 	if (out == NULL) {
 		return get_buffer_data_notnull;
@@ -16,14 +16,14 @@ void *get_buffer_data_notnull(duk_context *ctx, duk_idx_t index, duk_size_t *out
 	}
 }
 
-const duk_enclave_script_t *look_up_script(const char *key) {
+static const duk_enclave_script_t *look_up_script(const char *key) {
 	for (size_t i = 0; i < MAX_SCRIPT; i++) {
 		if (!strcmp(key, SCRIPTS[i].key)) return &SCRIPTS[i];
 	}
 	return NULL;
 }
 
-duk_int_t peval_lstring_filename(duk_context *ctx, const char *src, duk_size_t len) {
+static duk_int_t peval_lstring_filename(duk_context *ctx, const char *src, duk_size_t len) {
 	{
 		const duk_int_t result = duk_pcompile_lstring_filename(ctx, DUK_COMPILE_EVAL, src, len);
 		if (result != DUK_EXEC_SUCCESS) return result;
@@ -35,17 +35,17 @@ duk_int_t peval_lstring_filename(duk_context *ctx, const char *src, duk_size_t l
 	}
 }
 
-void throw_sgx_status(duk_context *ctx, sgx_status_t status, const char *source) {
+static void throw_sgx_status(duk_context *ctx, sgx_status_t status, const char *source) {
 	duk_push_error_object(ctx, DUK_ERR_ERROR, "%s failed (0x%04x)", source, status);
 	duk_throw(ctx);
 }
 
-void output_debug_line(const char *line) {
+static void output_debug_line(const char *line) {
 	OutputDebugString(const_cast<char *>(line));
 	OutputDebugString("\n");
 }
 
-void report_error(duk_context *ctx) {
+static void report_error(duk_context *ctx) {
 	if (duk_is_error(ctx, -1)) {
 		duk_get_prop_string(ctx, -1, "stack");
 		const char * const message = duk_safe_to_string(ctx, -1);
@@ -57,7 +57,7 @@ void report_error(duk_context *ctx) {
 	}
 }
 
-void report_fatal(duk_context *ctx, duk_errcode_t code, const char *msg) {
+static void report_fatal(duk_context *ctx, duk_errcode_t code, const char *msg) {
 	output_debug_line(msg);
 	abort();
 }
