@@ -42,14 +42,10 @@ var crypto = (function () {
         return alg;
     };
     var normalizeBufferSource = function (src) {
-        if (typeof src === 'buffer') {
-            return new Uint8Array(src);
-        } else {
-            return new Uint8Array(Duktape.Buffer(src), src.byteOffset, src.byteLength);
-        }
+        return new Uint8Array(Duktape.Buffer(src), src.byteOffset, src.byteLength);
     };
     var equals128 = function (a, b) {
-        if (a.byteLength !== 16 || b.byteLength !== 16) return false;
+        if (a.length !== 16 || b.length !== 16) return false;
         for (var i = 0; i < 16; i++) {
             if (a[i] !== b[i]) return false;
         }
@@ -109,19 +105,19 @@ var crypto = (function () {
             },
             verify: function (algorithm, key, signature, data) {
                 algorithm = normalizeAlgorithmShallow(algorithm);
+                signature = normalizeBufferSource(signature);
                 switch (algorithm.name) {
                     case 'AES-CMAC':
                         if (algorithm.length !== 128) throw new Error('length ' + algorithm.length + ' not supported');
                         var expectedSignature = _dukEnclaveNative.aescmacSign(key.raw, data);
-                        return Promise.resolve(equals128(normalizeBufferSource(signature), new Uint8Array(expectedSignature)));
+                        return Promise.resolve(equals128(signature, new Uint8Array(expectedSignature)));
                     case 'ECDSA':
                         algorithm.hash = normalizeAlgorithmShallow(algorithm.hash);
                         if (algorithm.hash.name !== 'SHA-256') throw new Error('hash ' + algorithm.hash.name + ' not supported');
-                        signature = normalizeBufferSource(signature);
                         var signatureLE = new ArrayBuffer(64);
-                        reverse256(new Uint8Array(signatureLE, 0, 32), new Uint8Array(signature, 0, 32));
-                        reverse256(new Uint8Array(signatureLE, 32, 32), new Uint8Array(signature, 32, 32));
-                        return Promise.resolve(_dukEnclaveNative.ecdsaVerify(key.raw, signature, data));
+                        reverse256(new Uint8Array(signatureLE, 0, 32), signature.subarray(0, 32));
+                        reverse256(new Uint8Array(signatureLE, 32, 32), signature.subarray(32, 64));
+                        return Promise.resolve(_dukEnclaveNative.ecdsaVerify(key.raw, signatureLE, data));
                     default:
                         throw new Error('algorithm ' + algorithm.name + ' not supported');
                 }
@@ -180,9 +176,8 @@ var crypto = (function () {
                 }
             },
             importKey: function (format, keyData, algorithm, extractable, keyUsages) {
-                if (format !== 'raw') throw new Error('format ' + format + ' not supported');
-                // Haaaaaaack. Assume it's a secret key, and guess based on the length for ECDH/ECDSA.
                 algorithm = normalizeAlgorithmShallow(algorithm);
+                keyData = normalizeBufferSource(keyData);
                 var result = {
                     type: null,
                     extractable: true,
@@ -190,35 +185,70 @@ var crypto = (function () {
                     usages: keyUsages,
                     raw: null,
                 };
-                // TODO: What with all the endianness conversion, we might as well add the DER stuff.
                 switch (algorithm.name) {
+                    case 'AES-GCM':
+                    case 'AES-CTR':
+                    case 'AES-CMAC':
+                        if (format !== 'raw') throw new Error('format ' + format + ' not supported');
+                        if (keyData.length !== 16) throw new Error('wrong keyData length');
+                        result.type = 'secret';
+                        result.raw = keyData.slice().buffer;
                     case 'ECDH':
                     case 'ECDSA':
                         if (algorithm.namedCurve !== 'P-256') throw new Error('namedCurve ' + algorithm.namedCurve + ' not supported');
-                        var keyLength = keyData.byteLength || keyData.length;
-                        if (keyLength === 64) {
-                            result.type = 'public';
-                            result.raw = new ArrayBuffer(64);
-                            reverse256(new Uint8Array(result.raw, 0, 32), new Uint8Array(keyData, 0, 32));
-                            reverse256(new Uint8Array(result.raw, 32, 32), new Uint8Array(keyData, 32, 32));
-                        } else if (keyLength === 32) {
-                            result.type = 'private';
-                            result.raw = new ArrayBuffer(32);
-                            reverse256(new Uint8Array(result.raw, 0, 32), new Uint8Array(keyData, 0, 32));
-                        } else {
-                            throw new Error('unrecognized keyData length');
+                        // TODO: What with all the endianness conversion, we might as well add the DER stuff.
+                        switch (format) {
+                            case 'raw-public-uncompressed-be':
+                                if (keyData.length !== 64) throw new Error('wrong keyData length');
+                                result.type = 'public';
+                                result.raw = new ArrayBuffer(64);
+                                reverse256(new Uint8Array(result.raw, 0, 32), keyData.subarray(0, 32));
+                                reverse256(new Uint8Array(result.raw, 32, 32), keyData.subarray(32, 64));
+                                break;
+                            case 'raw-private-be':
+                                if (keyData.length !== 32) throw new Error('wrong keyData length');
+                                result.type = 'private';
+                                result.raw = new ArrayBuffer(32);
+                                reverse256(new Uint8Array(result.raw, 0, 32), keyData.subarray(0, 32));
+                                break;
+                            default:
+                                throw new Error('format ' + format + ' not supported');
                         }
                         break;
                     default:
-                        result.type = 'secret';
-                        result.raw = keyData;
+                        throw new Error('algorithm ' + algorithm.name + ' not supported');
                 }
                 return Promise.resolve(result);
             },
             exportKey: function (format, key) {
-                if (format !== 'raw') throw new Error('format ' + format + ' not supported');
-                // TODO: Swap endianness.
-                return Promise.resolve(key.raw);
+                var result;
+                switch (key.algorithm.name) {
+                    case 'AES-GCM':
+                    case 'AES-CTR':
+                    case 'AES-CMAC':
+                        if (format !== 'raw') throw new Error('format ' + format + ' not supported');
+                        result = key.raw.slice();
+                    case 'ECDH':
+                    case 'ECDSA':
+                        switch (format) {
+                            case 'raw-public-uncompressed-be':
+                                if (key.type !== 'public') throw new Error('wrong key type');
+                                result = new ArrayBuffer(64);
+                                reverse256(new Uint8Array(result, 0, 32), new Uint8Array(key.raw, 0, 32));
+                                reverse256(new Uint8Array(result, 32, 32), new Uint8Array(key.raw, 32, 32));
+                                break;
+                            case 'raw-private-be':
+                                if (key.type !== 'private') throw new Error('wrong key type');
+                                result = new ArrayBuffer(32);
+                                reverse256(new Uint8Array(result, 0, 32), new Uint8Array(key.raw, 0, 32));
+                                break;
+                            default:
+                                throw new Error('format ' + format + ' not supported');
+                        }
+                    default:
+                        throw new Error('algorithm ' + algorithm.name + ' not supported');
+                }
+                return Promise.resolve(result);
             },
             wrapKey: function (format, key, wrappingKey, wrapAlgorithm) {
                 throw new Error('wrapKey not supported');
