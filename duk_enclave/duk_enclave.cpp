@@ -62,6 +62,19 @@ void report_fatal(duk_context *ctx, duk_errcode_t code, const char *msg) {
 	abort();
 }
 
+struct ecc_auto_state_handle {
+	duk_context *ctx;
+	sgx_ecc_state_handle_t ecc_handle;
+	ecc_auto_state_handle(duk_context *ctx) : ctx(ctx) {
+		const sgx_status_t status = sgx_ecc256_open_context(&ecc_handle);
+		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecc256_open_context");
+	}
+	~ecc_auto_state_handle() {
+		const sgx_status_t status = sgx_ecc256_close_context(ecc_handle);
+		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecc256_close_context");
+	}
+};
+
 static duk_ret_t native_post_message(duk_context *ctx) {
 	const char * const message = duk_get_string(ctx, 0);
 	if (message == NULL) return DUK_RET_TYPE_ERROR;
@@ -99,7 +112,6 @@ static duk_ret_t native_debug(duk_context *ctx) {
 	output_debug_line(arg);
 	return 0;
 }
-
 
 static duk_ret_t native_get_random_values(duk_context *ctx) {
 	duk_size_t array_size;
@@ -268,22 +280,14 @@ static duk_ret_t native_aesctr_decrypt(duk_context *ctx) {
 static duk_ret_t native_ec_generate_key(duk_context *ctx) {
 	void * const public_key = duk_push_fixed_buffer(ctx, sizeof(sgx_ec256_public_t));
 	void * const private_key = duk_push_fixed_buffer(ctx, sizeof(sgx_ec256_private_t));
-	sgx_ecc_state_handle_t ecc_handle;
 	{
-		const sgx_status_t status = sgx_ecc256_open_context(&ecc_handle);
-		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecc256_open_context");
-	}
-	{
+		ecc_auto_state_handle ecc_context(ctx);
 		const sgx_status_t status = sgx_ecc256_create_key_pair(
 			reinterpret_cast<sgx_ec256_private_t *>(private_key),
 			reinterpret_cast<sgx_ec256_public_t *>(public_key),
-			ecc_handle
+			ecc_context.ecc_handle
 		);
 		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecc256_create_key_pair");
-	}
-	{
-		const sgx_status_t status = sgx_ecc256_close_context(ecc_handle);
-		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecc256_close_context");
 	}
 	duk_push_object(ctx);
 	// [public plain buffer] [private plain buffer] [object]
@@ -303,23 +307,15 @@ static duk_ret_t native_ecdh_derive_bits(duk_context *ctx) {
 	void * const private_key = duk_get_buffer_data(ctx, 1, &private_key_size);
 	if (public_key_size != sizeof(sgx_ec256_public_t) || private_key_size != sizeof(sgx_ec256_private_t)) return DUK_RET_ERROR;
 	void * const out = duk_push_fixed_buffer(ctx, sizeof(sgx_ec256_dh_shared_t));
-	sgx_ecc_state_handle_t ecc_handle;
 	{
-		const sgx_status_t status = sgx_ecc256_open_context(&ecc_handle);
-		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecc256_open_context");
-	}
-	{
+		ecc_auto_state_handle ecc_context(ctx);
 		const sgx_status_t status = sgx_ecc256_compute_shared_dhkey(
 			reinterpret_cast<sgx_ec256_private_t *>(private_key),
 			reinterpret_cast<sgx_ec256_public_t *>(public_key),
 			reinterpret_cast<sgx_ec256_dh_shared_t *>(out),
-			ecc_handle
+			ecc_context.ecc_handle
 		);
 		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecc256_compute_shared_dhkey");
-	}
-	{
-		const sgx_status_t status = sgx_ecc256_close_context(ecc_handle);
-		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecc256_close_context");
 	}
 	duk_push_buffer_object(ctx, -1, 0, sizeof(sgx_ec256_dh_shared_t), DUK_BUFOBJ_ARRAYBUFFER);
 	return 1;
@@ -334,23 +330,15 @@ static duk_ret_t native_ecdsa_sign(duk_context *ctx) {
 	const void * const data = get_buffer_data_notnull(ctx, 1, &data_size);
 	if (key_size != sizeof(sgx_ec256_private_t)) return DUK_RET_ERROR;
 	void * const out = duk_push_fixed_buffer(ctx, sizeof(sgx_ec256_signature_t));
-	sgx_ecc_state_handle_t ecc_handle;
 	{
-		const sgx_status_t status = sgx_ecc256_open_context(&ecc_handle);
-		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecc256_open_context");
-	}
-	{
+		ecc_auto_state_handle ecc_context(ctx);
 		const sgx_status_t status = sgx_ecdsa_sign(
 			reinterpret_cast<const uint8_t *>(data), data_size,
 			reinterpret_cast<sgx_ec256_private_t *>(key),
 			reinterpret_cast<sgx_ec256_signature_t *>(out),
-			ecc_handle
+			ecc_context.ecc_handle
 		);
 		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecdsa_sign");
-	}
-	{
-		const sgx_status_t status = sgx_ecc256_close_context(ecc_handle);
-		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecc256_close_context");
 	}
 	duk_push_buffer_object(ctx, -1, 0, sizeof(sgx_ec256_signature_t), DUK_BUFOBJ_ARRAYBUFFER);
 	return 1;
@@ -363,26 +351,18 @@ static duk_ret_t native_ecdsa_verify(duk_context *ctx) {
 	void * const signature = duk_get_buffer_data(ctx, 1, &signature_size);
 	duk_size_t data_size;
 	const void * const data = get_buffer_data_notnull(ctx, 2, &data_size);
-	if (key_size != sizeof(sgx_ec256_private_t) || signature_size != sizeof(sgx_ec256_signature_t)) return DUK_RET_ERROR;
+	if (key_size != sizeof(sgx_ec256_public_t) || signature_size != sizeof(sgx_ec256_signature_t)) return DUK_RET_ERROR;
 	uint8_t out;
-	sgx_ecc_state_handle_t ecc_handle;
 	{
-		const sgx_status_t status = sgx_ecc256_open_context(&ecc_handle);
-		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecc256_open_context");
-	}
-	{
+		ecc_auto_state_handle ecc_context(ctx);
 		const sgx_status_t status = sgx_ecdsa_verify(
 			reinterpret_cast<const uint8_t *>(data), data_size,
 			reinterpret_cast<sgx_ec256_public_t *>(key),
 			reinterpret_cast<sgx_ec256_signature_t *>(signature),
 			&out,
-			ecc_handle
+			ecc_context.ecc_handle
 		);
 		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecdsa_verify");
-	}
-	{
-		const sgx_status_t status = sgx_ecc256_close_context(ecc_handle);
-		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_ecc256_close_context");
 	}
 	duk_push_boolean(ctx, out == SGX_EC_VALID);
 	return 1;

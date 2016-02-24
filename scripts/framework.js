@@ -162,6 +162,7 @@ var crypto = (function () {
                 switch (algorithm.name) {
                     case 'ECDH':
                     case 'ECDSA':
+                        if (algorithm.namedCurve !== 'P-256') throw new Error('namedCurve ' + algorithm.namedCurve + ' not supported');
                         var keyLength = keyData.byteLength || keyData.length;
                         if (keyLength === 64) {
                             result.type = 'public';
@@ -170,6 +171,7 @@ var crypto = (function () {
                         } else {
                             throw new Error('unrecognized keyData length');
                         }
+                        break;
                 }
                 return Promise.resolve(result);
             },
