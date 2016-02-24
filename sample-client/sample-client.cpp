@@ -31,7 +31,10 @@ int _tmain(int argc, _TCHAR* argv[]) {
 		}
 	}
 	{
-		const sgx_status_t status = duk_enclave_emit_message(enclave_id, "\"\"");
+//                                                                                  v
+// #define SIG_HEX "3629ea2ac4b56561e6d92f85ed70972bc34674bec01b9671204ea6f9c8af55f8107130b13a60b1a3d04f22d303d1e86ca7e311635f1328bea94588a8be69f518"
+   #define SIG_HEX "f855afc8f9a64e2071961bc0be7446c32b9770ed852fd9e66165b5c42aea293618f569bea88845a9be28135f6311e3a76ce8d103d3224fd0a3b1603ab1307110"
+		const sgx_status_t status = duk_enclave_emit_message(enclave_id, "{\"signature\":\"" SIG_HEX "\",\"data\":\"68656c6c6f20776f726c64\"}");
 		if (status != SGX_SUCCESS) {
 			std::cerr << "duk_enclave_emit_message failed" << std::endl;
 			exit(status);
