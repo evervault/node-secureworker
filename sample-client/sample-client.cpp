@@ -16,6 +16,10 @@ void duk_enclave_post_message(const char *message) {
 	std::cout << message << std::endl;
 }
 
+void duk_enclave_debug(const char *message) {
+	std::cerr << message << std::endl;
+}
+
 int _tmain(int argc, _TCHAR* argv[]) {
 	sgx_enclave_id_t enclave_id;
 	{

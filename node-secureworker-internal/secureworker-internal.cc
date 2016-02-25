@@ -192,4 +192,8 @@ void duk_enclave_post_message(const char *message) {
 	handle_post_message.As<v8::Function>()->Call(thread_entry->entrant, 1, arguments);
 }
 
+void duk_enclave_debug(const char *message) {
+	std::cerr << message << std::endl;
+}
+
 NODE_MODULE(secureworker_internal, secureworker_internal_init);

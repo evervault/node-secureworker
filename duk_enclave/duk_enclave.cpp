@@ -42,6 +42,9 @@ static void throw_sgx_status(duk_context *ctx, sgx_status_t status, const char *
 }
 
 static void output_debug_line(const char *line) {
+#ifndef NDEBUG
+	duk_enclave_debug(line);
+#endif
 	OutputDebugString(const_cast<char *>(line));
 	OutputDebugString("\n");
 }
