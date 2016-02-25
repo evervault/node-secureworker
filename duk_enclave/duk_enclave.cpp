@@ -33,6 +33,7 @@ static duk_int_t peval_lstring_filename(duk_context *ctx, const char *src, duk_s
 		const duk_int_t result = duk_pcall_method(ctx, 0);
 		if (result != DUK_EXEC_SUCCESS) return result;
 	}
+	return DUK_EXEC_SUCCESS;
 }
 
 static void throw_sgx_status(duk_context *ctx, sgx_status_t status, const char *source) {
