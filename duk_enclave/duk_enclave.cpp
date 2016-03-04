@@ -12,7 +12,7 @@
 static void *get_buffer_data_notnull(duk_context *ctx, duk_idx_t index, duk_size_t *out_size) {
 	void * const out = duk_get_buffer_data(ctx, index, out_size);
 	if (out == NULL) {
-		return get_buffer_data_notnull;
+		return reinterpret_cast<void *>(get_buffer_data_notnull);
 	} else {
 		return out;
 	}
