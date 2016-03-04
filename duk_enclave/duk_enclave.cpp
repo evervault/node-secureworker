@@ -1,6 +1,8 @@
 #include "duk_enclave_t.h"
 
+#ifdef _WIN32
 #include "sgx_debug.h"
+#endif
 #include "sgx_tcrypto.h"
 #include "sgx_trts.h"
 #include "duktape.h"
@@ -45,8 +47,10 @@ static void output_debug_line(const char *line) {
 #ifndef NDEBUG
 	duk_enclave_debug(line);
 #endif
+#ifdef _WIN32
 	OutputDebugString(const_cast<char *>(line));
 	OutputDebugString("\n");
+#endif
 }
 
 static void report_error(duk_context *ctx) {
