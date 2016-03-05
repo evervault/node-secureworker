@@ -1,4 +1,7 @@
 enclave {
+	include "sgx_report.h"
+	from "sgx_tae_service.edl" import *;
+
 	trusted {
 		/* define ECALLs here. */
 		public void duk_enclave_init([in, string] const char *key);
@@ -10,5 +13,7 @@ enclave {
 		/* define OCALLs here. */
 		void duk_enclave_post_message([in, string] const char *message);
 		void duk_enclave_debug([in, string] const char *message);
+		void duk_enclave_init_quote([out] sgx_target_info_t *p_target_info);
+		void duk_enclave_post_quote_report([in] sgx_report_t *report);
 	};
 };

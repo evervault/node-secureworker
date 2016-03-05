@@ -15,6 +15,7 @@ F.onMessage(function (message) {
         }, publicKey, Duktape.dec('hex', message.signature), Duktape.dec('hex', message.data));
     }).then(function (valid) {
         F.postMessage(valid);
+        _dukEnclaveNative.postQuote(new Uint8Array(64));
     }).catch(function (reason) {
         console.log('rejected', reason.stack || reason);
     });
