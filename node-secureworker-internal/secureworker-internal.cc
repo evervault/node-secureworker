@@ -3,17 +3,21 @@
 #include <iomanip>
 #include <iostream> // %%%
 #include <sstream>
-#include <tchar.h>
 
 #include "sgx_uae_service.h"
 #include "sgx_urts.h"
-#include "build/duk_enclave_u.h"
+#include "duk_enclave_u.h"
 
 // Track the "current" ECALL's associated Object so that OCALLS can find the callback.
 
 struct entry_info;
 
-__declspec(thread) entry_info *thread_entry = nullptr;
+#ifdef _WIN32
+__declspec(thread)
+#else
+__thread
+#endif
+entry_info *thread_entry = nullptr;
 
 struct entry_info {
 	entry_info *previous;
@@ -223,7 +227,7 @@ void duk_enclave_post_quote_report(sgx_report_t *report) {
 	// If they've tampered with the ArrayBuffer symbol, then we're in trouble.
 	v8::Local<v8::Object> quote_buffer = v8::Context::GetCurrent()->Global()->Get(v8::String::NewSymbol("ArrayBuffer")).As<v8::Function>()->NewInstance(1, arraybuffer_arguments);
 	void *quote_memory = quote_buffer->GetIndexedPropertiesExternalArrayData();
-	if (quote_buffer->GetIndexedPropertiesExternalArrayDataType() != v8::kExternalUnsignedByteArray || quote_buffer->GetIndexedPropertiesExternalArrayDataLength() != quote_size) {
+	if (quote_buffer->GetIndexedPropertiesExternalArrayDataType() != v8::kExternalUnsignedByteArray || quote_buffer->GetIndexedPropertiesExternalArrayDataLength() != (int) quote_size) {
 		std::cerr << "ArrayBuffer not constructed right" << std::endl;
 		return;
 	}
