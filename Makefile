@@ -1,6 +1,7 @@
 ######## SGX SDK Settings ########
 
 SGX_SDK ?= /opt/intel/sgxsdk
+SGX_DEBUG ?= 1
 SGX_MODE ?= SIM
 SGX_ARCH ?= x64
 
@@ -101,7 +102,7 @@ endif
 
 ######## node-secureworker ########
 
-all: duk_enclave/duk_enclave.signed.so
+all: duk_enclave/duk_enclave.signed.so sample-client/sample-client
 
 duktape_dist_c := $(wildcard duktape-1.4.0/src-separate/*.c)
 duktape_dist_o := $(duktape_dist_c:.c=.o)
@@ -120,15 +121,20 @@ scripts/scripts-table.o: scripts/scripts.h
 duk_enclave/duk_enclave_private.pem:
 	openssl genrsa -out $@ -3 3072
 
-%_t.c %_h.c: %.edl
+%_t.c %_t.h: %.edl
 	cd $(<D) && $(SGX_EDGER8R) --trusted $(<F) --search-path $(SGX_SDK)/include
 
-duk_enclave/duk_enclave_t.o: CFLAGS+=$(Enclave_C_Flags)
+duk_enclave/duk_enclave_t.o: CFLAGS += $(Enclave_C_Flags)
 
-duk_enclave/duk_enclave.o: CXXFLAGS+=$(Enclave_Cpp_Flags) -Iduktape-1.4.0/src-separate -Iscripts
+%_u.c %_u.h: %.edl
+	cd $(<D) && $(SGX_EDGER8R) --untrusted $(<F) --search-path $(SGX_SDK)/include
+
+duk_enclave/duk_enclave_u.o: CFLAGS += $(App_C_Flags)
+
+duk_enclave/duk_enclave.o: CXXFLAGS += $(Enclave_Cpp_Flags) -Iduktape-1.4.0/src-separate -Iscripts
 duk_enclave/duk_enclave.o: duk_enclave/duk_enclave_t.h duktape-1.4.0/src-separate/duktape.h scripts/scripts.h
 
-duk_enclave/duk_enclave.so: LDLIBS+=$(Enclave_Link_Flags)
+duk_enclave/duk_enclave.so: LDLIBS += $(Enclave_Link_Flags)
 duk_enclave/duk_enclave.so: $(duktape_dist_o) scripts/scripts-binary.o scripts/scripts-table.o duk_enclave/duk_enclave_t.o duk_enclave/duk_enclave.o
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
@@ -139,4 +145,12 @@ duk_enclave/duk_enclave.signed.so: duk_enclave/duk_enclave.so duk_enclave/duk_en
 		-out $@ \
 		-config duk_enclave/duk_enclave.config.xml
 
+sample-client/sample-client.o: CXXFLAGS += $(App_Cpp_Flags) -Iduk_enclave
+sample-client/sample-client.o: duk_enclave/duk_enclave_u.h
+
+sample-client/sample-client: LDLIBS += $(App_Link_Flags)
+sample-client/sample-client: duk_enclave/duk_enclave_u.o sample-client/sample-client.o
+	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
 .PHONY: all
+.SECONDARY: duk_enclave/duk_enclave_t.c duk_enclave/duk_enclave_t.h duk_enclave/duk_enclave_u.c duk_enclave/duk_enclave_u.h
