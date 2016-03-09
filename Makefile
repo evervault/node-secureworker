@@ -39,8 +39,10 @@ endif
 
 ifneq ($(SGX_MODE), HW)
 	Urts_Library_Name := sgx_urts_sim
+	Uae_Service_Library_Name := sgx_uae_service_sim
 else
 	Urts_Library_Name := sgx_urts
+	Uae_Service_Library_Name := sgx_uae_service
 endif
 
 App_Include_Paths := -I$(SGX_SDK)/include
@@ -60,12 +62,9 @@ else
 endif
 
 App_Cpp_Flags := $(App_C_Flags) -std=c++11
-App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread
+App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread -l$(Uae_Service_Library_Name)
 
 ifneq ($(SGX_MODE), HW)
-	App_Link_Flags += -lsgx_uae_service_sim
-else
-	App_Link_Flags += -lsgx_uae_service
 endif
 
 ######## Enclave Settings ########
@@ -152,5 +151,11 @@ sample-client/sample-client: LDLIBS += $(App_Link_Flags)
 sample-client/sample-client: duk_enclave/duk_enclave_u.o sample-client/sample-client.o
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-.PHONY: all
+node-gyp-build: export SGX_SDK := $(SGX_SDK)
+node-gyp-build: export SGX_LIBRARY_PATH := $(SGX_LIBRARY_PATH)
+node-gyp-build: export SGX_URTS_LIBRARY_NAME := $(Urts_Library_Name)
+node-gyp-build: binding.gyp node-secureworker-internal/secureworker-internal.cc duk_enclave/duk_enclave_u.h duk_enclave/duk_enclave_u.o
+	node-gyp build --verbose
+
+.PHONY: all node-gyp-build
 .SECONDARY: duk_enclave/duk_enclave_t.c duk_enclave/duk_enclave_t.h duk_enclave/duk_enclave_u.c duk_enclave/duk_enclave_u.h
