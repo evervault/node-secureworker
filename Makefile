@@ -101,7 +101,7 @@ endif
 
 ######## node-secureworker ########
 
-all: duk_enclave/duk_enclave.signed.so sample-client/sample-client
+all: duk_enclave/duk_enclave.signed.so sample-client/sample-client build/Release/secureworker_internal.node
 
 duktape_dist_c := $(wildcard duktape-1.4.0/src-separate/*.c)
 duktape_dist_o := $(duktape_dist_c:.c=.o)
@@ -109,6 +109,9 @@ duktape_dist_o := $(duktape_dist_c:.c=.o)
 duktape-1.4.0/src-separate/%.o: CXXFLAGS+=$(Enclave_Cpp_Flags) -DDUK_OPT_NO_FILE_IO -DDUK_OPT_CPP_EXCEPTIONS -DDUK_OPT_NO_JX
 duktape-1.4.0/src-separate/%.o: duktape-1.4.0/src-separate/%.c
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+duktape-1.4.0/libduktape.a: $(duktape_dist_o)
+	ar -rcs $@ $^
 
 scripts_js := $(wildcard scripts/*.js)
 
@@ -133,8 +136,8 @@ duk_enclave/duk_enclave_u.o: CFLAGS += $(App_C_Flags)
 duk_enclave/duk_enclave.o: CXXFLAGS += $(Enclave_Cpp_Flags) -Iduktape-1.4.0/src-separate -Iscripts
 duk_enclave/duk_enclave.o: duk_enclave/duk_enclave_t.h duktape-1.4.0/src-separate/duktape.h scripts/scripts.h
 
-duk_enclave/duk_enclave.so: LDLIBS += $(Enclave_Link_Flags)
-duk_enclave/duk_enclave.so: $(duktape_dist_o) scripts/scripts-binary.o scripts/scripts-table.o duk_enclave/duk_enclave_t.o duk_enclave/duk_enclave.o
+duk_enclave/duk_enclave.so: LDLIBS += -Lduktape-1.4.0 -lduktape $(Enclave_Link_Flags)
+duk_enclave/duk_enclave.so: scripts/scripts-binary.o scripts/scripts-table.o duk_enclave/duk_enclave_t.o duk_enclave/duk_enclave.o
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 duk_enclave/duk_enclave.signed.so: duk_enclave/duk_enclave.so duk_enclave/duk_enclave_private.pem duk_enclave/duk_enclave.config.xml
@@ -151,11 +154,11 @@ sample-client/sample-client: LDLIBS += $(App_Link_Flags)
 sample-client/sample-client: duk_enclave/duk_enclave_u.o sample-client/sample-client.o
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-node-gyp-build: export SGX_SDK := $(SGX_SDK)
-node-gyp-build: export SGX_LIBRARY_PATH := $(SGX_LIBRARY_PATH)
-node-gyp-build: export SGX_URTS_LIBRARY_NAME := $(Urts_Library_Name)
-node-gyp-build: binding.gyp node-secureworker-internal/secureworker-internal.cc duk_enclave/duk_enclave_u.h duk_enclave/duk_enclave_u.o
+build/Release/secureworker_internal.node: export SGX_SDK := $(SGX_SDK)
+build/Release/secureworker_internal.node: export SGX_LIBRARY_PATH := $(SGX_LIBRARY_PATH)
+build/Release/secureworker_internal.node: export SGX_URTS_LIBRARY_NAME := $(Urts_Library_Name)
+build/Release/secureworker_internal.node: node-secureworker-internal/secureworker-internal.cc duk_enclave/duk_enclave_u.h duk_enclave/duk_enclave_u.o
 	node-gyp build --verbose
 
-.PHONY: all node-gyp-build
+.PHONY: all
 .SECONDARY: duk_enclave/duk_enclave_t.c duk_enclave/duk_enclave_t.h duk_enclave/duk_enclave_u.c duk_enclave/duk_enclave_u.h
