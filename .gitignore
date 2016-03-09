@@ -3,6 +3,7 @@
 *.a
 *.o
 *.so
+*.tar.gz
 
 sample-client/sample-client
 
