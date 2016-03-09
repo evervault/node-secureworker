@@ -1,8 +1,6 @@
 // sample-client.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
-
 #include <iostream>
 
 #include "sgx_uae_service.h"
@@ -54,12 +52,16 @@ void duk_enclave_post_quote_report(sgx_report_t *report) {
 	std::cout << "received quote" << std::endl;
 }
 
-int _tmain(int argc, _TCHAR* argv[]) {
+int main(int argc, char* argv[]) {
+	if (argc < 2) {
+		std::cerr << "usage: " << argv[0] << " signed-enclave" << std::endl;
+		return 1;
+	}
 	sgx_enclave_id_t enclave_id;
 	{
 		sgx_launch_token_t launch_token;
 		int launch_token_updated;
-		const sgx_status_t status = sgx_create_enclave(_T("duk_enclave.signed.dll"), SGX_DEBUG_FLAG, &launch_token, &launch_token_updated, &enclave_id, NULL);
+		const sgx_status_t status = sgx_create_enclave(argv[1], SGX_DEBUG_FLAG, &launch_token, &launch_token_updated, &enclave_id, NULL);
 		if (status != SGX_SUCCESS) {
 			std::cerr << "sgx_create_enclave failed" << std::endl;
 			exit(status);

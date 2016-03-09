@@ -3,6 +3,8 @@
 *.o
 *.so
 
+sample-client/sample-client
+
 # Edger8r output files
 *_t.c
 *_t.h

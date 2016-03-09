@@ -1,7 +1,6 @@
 #include <stddef.h>
 typedef struct duk_enclave_script {
 	const char *key;
-	size_t size;
 	const char *start;
 	const char *end;
 } duk_enclave_script_t;

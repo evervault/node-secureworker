@@ -113,7 +113,7 @@ static duk_ret_t native_import_script(duk_context *ctx) {
 	const duk_enclave_script_t *script = look_up_script(key);
 	if (script == NULL) return DUK_RET_ERROR;
 	duk_push_string(ctx, script->key);
-	const duk_int_t result = peval_lstring_filename(ctx, script->start, script->size);
+	const duk_int_t result = peval_lstring_filename(ctx, script->start, script->end - script->start);
 	if (result != DUK_EXEC_SUCCESS) duk_throw(ctx);
 	return 0;
 }
@@ -601,7 +601,7 @@ void duk_enclave_init(const char *key) {
 	const duk_enclave_script_t *script = look_up_script(key);
 	if (script == NULL) abort();
 	duk_push_string(ctx, script->key);
-	const duk_int_t result = peval_lstring_filename(ctx, script->start, script->size);
+	const duk_int_t result = peval_lstring_filename(ctx, script->start, script->end - script->start);
 	if (result == DUK_EXEC_ERROR) report_error(ctx);
 	duk_pop(ctx);
 	spin_microtasks(ctx);
