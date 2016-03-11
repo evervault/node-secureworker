@@ -1,7 +1,7 @@
-#!/bin/sh
-BUILDER_DIR=$(dirname "$0")
+#!/bin/sh -eux
+BUILDER_DIR=$(dirname "$0")/..
 SGX_SDK=/opt/intel/sgxsdk
-gcc "-I$BUILDER_DIR" -c "scripts-table.c"
+gcc -I"$BUILDER_DIR/scripts" -c "scripts-table.c"
 ld -r -b binary "$@" -o "scripts-binary.o"
 g++ \
 	"scripts-binary.o" \
@@ -11,15 +11,15 @@ g++ \
 	"$BUILDER_DIR/duktape-1.4.0/libduktape.a" \
 	-m64 -O0 -g \
 	-Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles \
-	"-L$SGX_SDK/lib64" \
+	-L"$SGX_SDK/lib64" \
 	-Wl,--whole-archive -lsgx_trts_sim -Wl,--no-whole-archive \
 	-Wl,--start-group -lsgx_tstdc -lsgx_tstdcxx -lsgx_tcrypto -lsgx_tservice_sim -Wl,--end-group \
 	-Wl,-Bstatic -Wl,-Bsymbolic -Wl,--no-undefined \
 	-Wl,-pie,-eenclave_entry -Wl,--export-dynamic \
 	-Wl,--defsym,__ImageBase=0 \
 	-o "duk_enclave.so"
-"$SGX_SDK/bin/x64/sgx_sign" \
-	-key "..\..\..\..\keys\app.private.pem" \
+"$SGX_SDK/bin/x64/sgx_sign" sign \
+	-key "../../../../keys/app.private.pem" \
 	-enclave "duk_enclave.so" \
 	-out "duk_enclave.signed.so" \
 	-config "$BUILDER_DIR/duk_enclave/duk_enclave.config.xml"
