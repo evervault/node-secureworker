@@ -1,19 +1,23 @@
 #include <node.h>
-#include <node_buffer.h>
 
 #include <iomanip>
 #include <iostream> // %%%
 #include <sstream>
-#include <tchar.h>
 
+#include "sgx_uae_service.h"
 #include "sgx_urts.h"
-#include "build/duk_enclave_u.h"
+#include "duk_enclave_u.h"
 
 // Track the "current" ECALL's associated Object so that OCALLS can find the callback.
 
 struct entry_info;
 
-__declspec(thread) entry_info *thread_entry = nullptr;
+#ifdef _WIN32
+__declspec(thread)
+#else
+__thread
+#endif
+entry_info *thread_entry = nullptr;
 
 struct entry_info {
 	entry_info *previous;
@@ -190,6 +194,56 @@ void duk_enclave_post_message(const char *message) {
 	if (!handle_post_message->IsFunction()) return;
 	v8::Local<v8::Value> arguments[] = {v8::String::New(message)};
 	handle_post_message.As<v8::Function>()->Call(thread_entry->entrant, 1, arguments);
+}
+
+void duk_enclave_debug(const char *message) {
+	std::cerr << message << std::endl;
+}
+
+void duk_enclave_init_quote(sgx_target_info_t *p_target_info) {
+	{
+		sgx_epid_group_id_t gid;
+		const sgx_status_t status = sgx_init_quote(p_target_info, &gid);
+		if (status != SGX_SUCCESS) {
+			std::cerr << "sgx_init_quote failed" << std::endl;
+			// TODO: Forward error to enclave.
+			return;
+		}
+	}
+}
+
+void duk_enclave_post_quote_report(sgx_report_t *report) {
+	v8::HandleScope scope;
+	assert(thread_entry != nullptr);
+	uint32_t quote_size;
+	{
+		const sgx_status_t status = sgx_get_quote_size(NULL, &quote_size);
+		if (status != SGX_SUCCESS) {
+			std::cerr << "sgx_get_quote_size failed" << std::endl;
+			return;
+		}
+	}
+	v8::Local<v8::Value> arraybuffer_arguments[] = {v8::Integer::New(quote_size)};
+	// If they've tampered with the ArrayBuffer symbol, then we're in trouble.
+	v8::Local<v8::Object> quote_buffer = v8::Context::GetCurrent()->Global()->Get(v8::String::NewSymbol("ArrayBuffer")).As<v8::Function>()->NewInstance(1, arraybuffer_arguments);
+	void *quote_memory = quote_buffer->GetIndexedPropertiesExternalArrayData();
+	if (quote_buffer->GetIndexedPropertiesExternalArrayDataType() != v8::kExternalUnsignedByteArray || quote_buffer->GetIndexedPropertiesExternalArrayDataLength() != (int) quote_size) {
+		std::cerr << "ArrayBuffer not constructed right" << std::endl;
+		return;
+	}
+	sgx_quote_t *quote = reinterpret_cast<sgx_quote_t *>(quote_memory);
+	{
+		const sgx_spid_t spid = {""};
+		const sgx_status_t status = sgx_get_quote(report, SGX_UNLINKABLE_SIGNATURE, &spid, NULL, NULL, 0, NULL, quote, quote_size);
+		if (status != SGX_SUCCESS) {
+			std::cerr << "sgx_get_quote failed" << std::endl;
+			return;
+		}
+	}
+	v8::Local<v8::Value> handle_post_quote = thread_entry->entrant->Get(v8::String::NewSymbol("handlePostQuote"));
+	if (!handle_post_quote->IsFunction()) return;
+	v8::Local<v8::Value> handler_arguments[] = {quote_buffer};
+	handle_post_quote.As<v8::Function>()->Call(thread_entry->entrant, 1, handler_arguments);
 }
 
 NODE_MODULE(secureworker_internal, secureworker_internal_init);

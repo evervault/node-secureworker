@@ -1,12 +1,19 @@
 .idea
 
+*.a
+*.o
+*.so
+*.tar.gz
+
+sample-client/sample-client
+
 # Edger8r output files
 *_t.c
 *_t.h
 *_u.c
 *_u.h
 
-# Enclave signing material
+# Debug keys
 *.pem
 
 # Created by https://www.gitignore.io/api/visualstudio

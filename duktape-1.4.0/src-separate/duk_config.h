@@ -560,14 +560,7 @@
 #include <endian.h>
 #include <stdint.h>
 #endif  /* DUK_F_BCC */
-#include <sys/param.h>
-#include <sys/time.h>
 #include <time.h>
-
-#define DUK_USE_DATE_NOW_GETTIMEOFDAY
-#define DUK_USE_DATE_TZO_GMTIME_R
-#define DUK_USE_DATE_PRS_STRPTIME
-#define DUK_USE_DATE_FMT_STRFTIME
 
 #define DUK_USE_OS_STRING "linux"
 #elif defined(DUK_F_SUN)
@@ -933,13 +926,7 @@
 #define DUK_F_VARIADIC_MACROS_PROVIDED
 #elif defined(DUK_F_GCC)
 /* --- GCC --- */
-#if defined(DUK_F_C99) || defined(DUK_F_CPP11)
-/* C99 / C++11 and above: rely on va_copy() which is required. */
 #define DUK_VA_COPY(dest,src) va_copy(dest,src)
-#else
-/* GCC: assume we have __va_copy() in non-C99 mode. */
-#define DUK_VA_COPY(dest,src) __va_copy(dest,src)
-#endif
 
 #if defined(DUK_F_GCC_VERSION) && (DUK_F_GCC_VERSION >= 20500L)
 /* since gcc-2.5 */
