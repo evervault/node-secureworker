@@ -42,6 +42,11 @@ static duk_int_t peval_lstring_filename(duk_context *ctx, const char *src, duk_s
 	return DUK_EXEC_SUCCESS;
 }
 
+static duk_int_t peval_enclave_script(duk_context *ctx, const duk_enclave_script_t *script) {
+	duk_push_string(ctx, script->key);
+	return peval_lstring_filename(ctx, script->start, script->end - script->start);
+}
+
 static void throw_sgx_status(duk_context *ctx, sgx_status_t status, const char *source) {
 	duk_push_error_object(ctx, DUK_ERR_ERROR, "%s failed (0x%04x)", source, status);
 	duk_throw(ctx);
@@ -113,8 +118,7 @@ static duk_ret_t native_import_script(duk_context *ctx) {
 	if (key == NULL) return DUK_RET_TYPE_ERROR;
 	const duk_enclave_script_t *script = look_up_script(key);
 	if (script == NULL) return DUK_RET_ERROR;
-	duk_push_string(ctx, script->key);
-	const duk_int_t result = peval_lstring_filename(ctx, script->start, script->end - script->start);
+	const duk_int_t result = peval_enclave_script(ctx, script);
 	if (result != DUK_EXEC_SUCCESS) duk_throw(ctx);
 	return 0;
 }
@@ -532,13 +536,18 @@ void duk_enclave_init(const char *key) {
 	duk_put_global_string(ctx, "_dukEnclaveNative");
 	duk_push_object(ctx);
 	duk_put_global_string(ctx, "_dukEnclaveHandlers");
+	// Startup code
+	if (AUTOEXEC_SCRIPT != NULL) {
+		const duk_int_t result = peval_enclave_script(ctx, AUTOEXEC_SCRIPT);
+		if (result != DUK_EXEC_SUCCESS) report_error(ctx);
+		duk_pop(ctx);
+	}
 	// Application code
 	if (key == NULL) abort();
 	const duk_enclave_script_t *script = look_up_script(key);
 	if (script == NULL) abort();
-	duk_push_string(ctx, script->key);
-	const duk_int_t result = peval_lstring_filename(ctx, script->start, script->end - script->start);
-	if (result == DUK_EXEC_ERROR) report_error(ctx);
+	const duk_int_t result = peval_enclave_script(ctx, script);
+	if (result != DUK_EXEC_SUCCESS) report_error(ctx);
 	duk_pop(ctx);
 	spin_microtasks(ctx);
 }
