@@ -112,7 +112,7 @@ duktape-1.4.0/src-separate/%.o: duktape-1.4.0/src-separate/%.c
 duktape-1.4.0/libduktape.a: $(duktape_dist_o)
 	ar -rcs $@ $^
 
-scripts_js := $(wildcard scripts/*.js)
+scripts_js := $(wildcard scripts/framework/*.js scripts/*.js)
 
 scripts/scripts-binary.o: $(scripts_js)
 	cd scripts && ld -r -b binary $(patsubst scripts/%,%,$^) -o scripts-binary.o
