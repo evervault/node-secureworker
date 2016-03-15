@@ -9,6 +9,7 @@ extern "C" {
 #endif
 extern const size_t MAX_SCRIPT;
 extern const duk_enclave_script_t SCRIPTS[];
+extern const duk_enclave_script_t *AUTOEXEC_SCRIPT;
 #ifdef __cplusplus
 }
 #endif
