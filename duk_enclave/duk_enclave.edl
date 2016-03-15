@@ -1,19 +1,19 @@
 enclave {
+	from "sgx_tkey_exchange.edl" import *;
+	include "sgx_key_exchange.h"
 	include "sgx_report.h"
-	from "sgx_tae_service.edl" import *;
 
 	trusted {
 		/* define ECALLs here. */
 		public void duk_enclave_init([in, string] const char *key);
 		public void duk_enclave_close();
 		public void duk_enclave_emit_message([in, string] const char *message);
+		public void duk_enclave_init_ra([out] sgx_ra_context_t *ra_context, int pse);
 	};
 
 	untrusted {
 		/* define OCALLs here. */
 		void duk_enclave_post_message([in, string] const char *message);
 		void duk_enclave_debug([in, string] const char *message);
-		void duk_enclave_init_quote([out] sgx_target_info_t *p_target_info);
-		void duk_enclave_post_quote_report([in] sgx_report_t *report);
 	};
 };
