@@ -27,7 +27,9 @@ var F = (function () {
         for (var i = 0; i < messageHandlersSnapshot.length; i++) {
             try {
                 messageHandlersSnapshot[i](message);
-            } catch (e) { }
+            } catch (e) {
+                _dukEnclaveNative.debug(e.stack || e);
+            }
         }
     };
     F.ready = Promise.resolve();
