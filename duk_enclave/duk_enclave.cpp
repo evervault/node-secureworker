@@ -129,6 +129,51 @@ static duk_ret_t native_debug(duk_context *ctx) {
 	return 0;
 }
 
+static duk_ret_t native_seal_data(duk_context *ctx) {
+	duk_size_t additional_data_size;
+	const void * const additional_data = duk_get_buffer_data(ctx, 0, &additional_data_size);
+	duk_size_t data_size;
+	const void * const data = duk_get_buffer_data(ctx, 1, &data_size);
+	const uint32_t sealed_data_size = sgx_calc_sealed_data_size(additional_data_size, data_size);
+	void * const sealed_data = duk_push_fixed_buffer(ctx, sealed_data_size);
+	{
+		const sgx_status_t status = sgx_seal_data(
+			additional_data_size, reinterpret_cast<const uint8_t *>(additional_data),
+			data_size, reinterpret_cast<const uint8_t *>(data),
+			sealed_data_size, reinterpret_cast<sgx_sealed_data_t *>(sealed_data)
+		);
+		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_seal_data");
+	}
+	duk_push_buffer_object(ctx, -1, 0, sealed_data_size, DUK_BUFOBJ_ARRAYBUFFER);
+	return 1;
+}
+
+static duk_ret_t native_unseal_data(duk_context *ctx) {
+	duk_size_t sealed_data_size;
+	const void * const sealed_data = duk_get_buffer_data(ctx, 0, &sealed_data_size);
+	uint32_t additional_data_size = sgx_get_add_mac_txt_len(reinterpret_cast<const sgx_sealed_data_t *>(sealed_data));
+	if (additional_data_size == UINT32_MAX) return DUK_RET_ERROR;
+	uint32_t data_size = sgx_get_encrypt_txt_len(reinterpret_cast<const sgx_sealed_data_t *>(sealed_data));
+	if (data_size == UINT32_MAX) return DUK_RET_ERROR;
+	void * const additional_data = duk_push_fixed_buffer(ctx, additional_data_size);
+	void * const data = duk_push_fixed_buffer(ctx, data_size);
+	{
+		const sgx_status_t status = sgx_unseal_data(
+			reinterpret_cast<const sgx_sealed_data_t *>(sealed_data),
+			reinterpret_cast<uint8_t *>(additional_data), &additional_data_size,
+			reinterpret_cast<uint8_t *>(data), &data_size
+		);
+		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_seal_data");
+	}
+	duk_push_object(ctx);
+	// [additional_data plain buffer] [data plain buffer] [object]
+	duk_push_buffer_object(ctx, -3, 0, additional_data_size, DUK_BUFOBJ_ARRAYBUFFER);
+	duk_put_prop_string(ctx, -2, "additionalData");
+	duk_push_buffer_object(ctx, -2, 0, data_size, DUK_BUFOBJ_ARRAYBUFFER);
+	duk_put_prop_string(ctx, -2, "data");
+	return 1;
+}
+
 static duk_ret_t native_get_time(duk_context *ctx) {
 	// No 64-bit integers. Thanks, JavaScript.
 	void * const current_time = duk_push_fixed_buffer(ctx, sizeof(sgx_time_t));
@@ -472,6 +517,8 @@ static const duk_function_list_entry native_methods[] = {
 	{"nextTick", native_next_tick, 1},
 	{"importScript", native_import_script, 1},
 	{"debug", native_debug, 1},
+	{"sealData", native_seal_data, 2},
+	{"unsealData", native_unseal_data, 1},
 	{"getTime", native_get_time, 0},
 	{"createMonotonicCounter", native_create_monotonic_counter, 0},
 	{"destroyMonotonicCounter", native_destroy_monotonic_counter, 1},
