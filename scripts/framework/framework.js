@@ -8,6 +8,19 @@ var console = {
 
 var F = (function () {
     var F = {};
+    var alreadyImportedScripts = [];
+    F.importScripts = function (/* args */) {
+        for (var i = 0; i < arguments.length; i++) {
+            var contentKey = arguments[i];
+            if (alreadyImportedScripts.indexOf(contentKey) !== -1) continue;
+            alreadyImportedScripts.push(contentKey);
+            try {
+                _dukEnclaveNative.importScript(contentKey);
+            } catch (e) {
+                _dukEnclaveNative.debug(e.stack || e);
+            }
+        }
+    };
     F.postMessage = function (message) {
         var marshalledMessage = JSON.stringify(message);
         _dukEnclaveNative.postMessage(marshalledMessage);
