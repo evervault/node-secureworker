@@ -1,5 +1,3 @@
-_dukEnclaveNative.postMessage('"hello from framework"');
-
 Promise._setImmediateFn(_dukEnclaveNative.nextTick);
 
 var console = {
