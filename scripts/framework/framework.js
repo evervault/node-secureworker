@@ -168,7 +168,7 @@ var crypto = (function () {
 							extractable: true,
 							algorithm: algorithmOut,
 							usages: ['sign', 'deriveKey', 'deriveBits'],
-							raw: rawKeyPair.privateKeym
+							raw: rawKeyPair.privateKey,
 						},
 					});
 				default:
@@ -260,8 +260,9 @@ var crypto = (function () {
 					default:
 						throw new Error('format ' + format + ' not supported');
 					}
+					break;
 				default:
-					throw new Error('algorithm ' + algorithm.name + ' not supported');
+					throw new Error('algorithm ' + key.algorithm.name + ' not supported');
 				}
 				return Promise.resolve(result);
 			},
