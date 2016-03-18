@@ -206,6 +206,7 @@ var crypto = (function () {
                         if (keyData.length !== 16) throw new Error('wrong keyData length');
                         result.type = 'secret';
                         result.raw = keyData.slice().buffer;
+                        break;
                     case 'ECDH':
                     case 'ECDSA':
                         if (algorithm.namedCurve !== 'P-256') throw new Error('namedCurve ' + algorithm.namedCurve + ' not supported');
@@ -241,6 +242,7 @@ var crypto = (function () {
                     case 'AES-CMAC':
                         if (format !== 'raw') throw new Error('format ' + format + ' not supported');
                         result = key.raw.slice();
+                        break;
                     case 'ECDH':
                     case 'ECDSA':
                         switch (format) {
