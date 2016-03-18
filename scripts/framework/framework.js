@@ -69,6 +69,15 @@ var crypto = (function () {
 			dst[i] = src[31 - i];
 		}
 	};
+	var EC256_SPKI_PADDING = new Uint8Array([0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x03, 0x42]);
+	var EC256_PKCS8_PADDING = new Uint8Array([0x30, 0x81, 0x87, 0x02, 0x01, 0x00, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x04, 0x6D, 0x30, 0x6B, 0x02, 0x01, 0x01, 0x04, 0x20]);
+	var EC256_PKCS8_PADDING_BARE = new Uint8Array([0x30, 0x41, 0x02, 0x01, 0x00, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x04, 0x27, 0x30, 0x25, 0x02, 0x01, 0x01, 0x04, 0x20]);
+	var removePadding = function (src, padding, length) {
+		for (var i = 0; i < padding.length; i++) {
+			if (src[i] !== padding[i]) return null;
+		}
+		return src.subarray(padding.length, padding.length + length);
+	};
 	var crypto = {
 		getRandomValues: function (array) {
 			throw new Error('getRandomValues not supported');
@@ -212,6 +221,10 @@ var crypto = (function () {
 					if (algorithm.namedCurve !== 'P-256') throw new Error('namedCurve ' + algorithm.namedCurve + ' not supported');
 					// TODO: What with all the endianness conversion, we might as well add the DER stuff.
 					switch (format) {
+					case 'spki':
+						keyData = removePadding(keyData, EC256_SPKI_PADDING, 64);
+						if (!keyData) throw new Error('could not parse ' + format);
+						// Fall through
 					case 'raw-public-uncompressed-be':
 						if (keyData.length !== 64) throw new Error('wrong keyData length');
 						result.type = 'public';
@@ -219,6 +232,14 @@ var crypto = (function () {
 						reverse256(new Uint8Array(result.raw, 0, 32), keyData.subarray(0, 32));
 						reverse256(new Uint8Array(result.raw, 32, 32), keyData.subarray(32, 64));
 						break;
+					case 'pkcs8':
+						// Caveat: We don't support all configurations of optional
+						// fields in ECPrivateKey.
+						// http://tools.ietf.org/html/rfc5915#section-3
+						keyData = removePadding(keyData, EC256_PKCS8_PADDING, 32) ||
+							removePadding(keyData, EC256_PKCS8_PADDING_BARE, 32);
+						if (!keyData) throw new Error('could not parse ' + format);
+						// Fall through
 					case 'raw-private-be':
 						if (keyData.length !== 32) throw new Error('wrong keyData length');
 						result.type = 'private';
@@ -246,11 +267,24 @@ var crypto = (function () {
 				case 'ECDH':
 				case 'ECDSA':
 					switch (format) {
+					case 'spki':
+						if (key.type !== 'public') throw new Error('wrong key type');
+						result = new ArrayBuffer(EC256_SPKI_PADDING.length + 64);
+						new Uint8Array(result).set(EC256_SPKI_PADDING);
+						reverse256(new Uint8Array(result, EC256_SPKI_PADDING.length, 32), new Uint8Array(key.raw, 0, 32));
+						reverse256(new Uint8Array(result, EC256_SPKI_PADDING.length + 32, 32), new Uint8Array(key.raw, 32, 32));
+						break;
 					case 'raw-public-uncompressed-be':
 						if (key.type !== 'public') throw new Error('wrong key type');
 						result = new ArrayBuffer(64);
 						reverse256(new Uint8Array(result, 0, 32), new Uint8Array(key.raw, 0, 32));
 						reverse256(new Uint8Array(result, 32, 32), new Uint8Array(key.raw, 32, 32));
+						break;
+					case 'pkcs8':
+						if (key.type !== 'private') throw new Error('wrong key type');
+						result = new ArrayBuffer(EC256_PKCS8_PADDING_BARE.length + 32);
+						new Uint8Array(result).set(EC256_PKCS8_PADDING_BARE);
+						reverse256(new Uint8Array(result, EC256_PKCS8_PADDING_BARE.length, 32), new Uint8Array(key.raw, 0, 32));
 						break;
 					case 'raw-private-be':
 						if (key.type !== 'private') throw new Error('wrong key type');
