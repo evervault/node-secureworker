@@ -621,6 +621,9 @@ void duk_enclave_emit_message(const char *message) {
 	spin_microtasks(ctx);
 }
 
+// Remote attestation bootstrapping
+// This isn't in use yet.
+
 void duk_enclave_init_ra(sgx_ra_context_t *ra_context, int pse) {
 	if (state != NASCENT) abort();
 	state = RA;
@@ -628,7 +631,8 @@ void duk_enclave_init_ra(sgx_ra_context_t *ra_context, int pse) {
 		const sgx_status_t status = sgx_create_pse_session();
 		if (status != SGX_SUCCESS) abort();
 	}
-	const duk_enclave_script_t *sp_public_key = look_up_script("sp.private.raw");
+	// The file must be little-endian already.
+	const duk_enclave_script_t *sp_public_key = look_up_script("sp.public.raw");
 	if (sp_public_key == NULL) abort();
 	{
 		const sgx_status_t status = sgx_ra_init(
@@ -640,6 +644,63 @@ void duk_enclave_init_ra(sgx_ra_context_t *ra_context, int pse) {
 	}
 	if (pse) {
 		const sgx_status_t status = sgx_close_pse_session();
+		if (status != SGX_SUCCESS) abort();
+	}
+}
+
+void duk_enclave_bootstrap_ra(sgx_ra_context_t ra_context,
+                              sgx_sealed_data_t *out, size_t out_size,
+                              const uint8_t *iv, size_t iv_size,
+                              const uint8_t *additional_data, size_t additional_data_size,
+                              const uint8_t *data, size_t data_size,
+                              sgx_aes_gcm_128bit_tag_t *tag) {
+	if (state != RA) abort();
+	state = CLOSED;
+	sgx_aes_gcm_128bit_key_t sk_key;
+	{
+		const sgx_status_t status = sgx_ra_get_keys(ra_context, SGX_RA_KEY_SK, &sk_key);
+		if (status != SGX_SUCCESS) abort();
+	}
+	uint8_t clear[data_size];
+	{
+		const sgx_status_t status = sgx_rijndael128GCM_decrypt(
+			&sk_key,
+			data, data_size,
+			clear,
+			iv, iv_size,
+			additional_data, additional_data_size,
+			tag
+		);
+		if (status != SGX_SUCCESS) abort();
+	}
+	{
+		const sgx_status_t status = sgx_seal_data(
+			additional_data_size, additional_data,
+			data_size, clear,
+			out_size, out
+		);
+		if (status != SGX_SUCCESS) abort();
+	}
+	{
+		const sgx_status_t status = sgx_ra_close(ra_context);
+		if (status != SGX_SUCCESS) abort();
+	}
+}
+
+// Mock bootstrapping
+// Remove this when we can verify attestation.
+
+void duk_enclave_bootstrap_mock(sgx_sealed_data_t *out, size_t out_size,
+                                const uint8_t *additional_data, size_t additional_data_size,
+                                const uint8_t *clear, size_t data_size) {
+	if (state != NASCENT) abort();
+	state = CLOSED;
+	{
+		const sgx_status_t status = sgx_seal_data(
+			additional_data_size, additional_data,
+			data_size, clear,
+			out_size, out
+		);
 		if (status != SGX_SUCCESS) abort();
 	}
 }
