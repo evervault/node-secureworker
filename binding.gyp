@@ -8,6 +8,7 @@
 			],
 			"cflags": [
 				"-std=c++11",
+				"-g",
 			],
 			"cflags_cc!": [
 				"-fno-exceptions",
