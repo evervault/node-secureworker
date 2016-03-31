@@ -159,6 +159,7 @@ build:
 build/Release/secureworker_internal.node: export SGX_SDK := $(SGX_SDK)
 build/Release/secureworker_internal.node: export SGX_LIBRARY_PATH := $(SGX_LIBRARY_PATH)
 build/Release/secureworker_internal.node: export SGX_URTS_LIBRARY_NAME := $(Urts_Library_Name)
+build/Release/secureworker_internal.node: export SGX_SERVICE_LIBRARY_NAME := $(Service_Library_Name)
 build/Release/secureworker_internal.node: node-secureworker-internal/secureworker-internal.cc duk_enclave/duk_enclave_u.h duk_enclave/duk_enclave_u.o | build
 	node-gyp build
 

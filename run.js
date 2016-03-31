@@ -6,12 +6,12 @@ var w = new SecureWorkerInternal('duk_enclave/duk_enclave.signed.so');
 w.handlePostMessage = function (message) {
     console.log('from w:', message);
 };
-w.handlePostQuote = function (quote) {
-    console.log('quote from w:', new Buffer(new Uint8Array(quote)).toString('hex'));
-};
 w.init('main.js');
 w.emitMessage(JSON.stringify({
     signature: SIG_HEX,
     data: DATA_HEX,
 }));
 w.close();
+
+var s = new SecureWorkerInternal('duk_enclave/duk_enclave.signed.so').bootstrapMock(new Uint8Array([65, 66, 67]), new Uint32Array([68, 69, 70]));
+console.log(new Buffer(new Uint8Array(s)));
