@@ -21,6 +21,7 @@
 				"libraries": [
 					"-L$(SGX_LIBRARY_PATH)",
 					"-l$(SGX_URTS_LIBRARY_NAME)",
+					"-l$(SGX_SERVICE_LIBRARY_NAME)",
 				],
 			},
 		},
