@@ -191,7 +191,7 @@ var crypto = (function () {
 				algorithm = normalizeAlgorithmShallow(algorithm);
 				switch (algorithm.name) {
 				case 'ECDH':
-					if (length !== 32) throw new Error('length ' + length + ' not supported');
+					if (length !== 256) throw new Error('length ' + length + ' not supported');
 					return Promise.resolve(_dukEnclaveNative.ecdhDeriveBits(algorithm.public.raw, baseKey.raw));
 				default:
 					throw new Error('algorithm ' + algorithm.name + ' not supported');
