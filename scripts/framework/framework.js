@@ -192,7 +192,10 @@ var crypto = (function () {
 				switch (algorithm.name) {
 				case 'ECDH':
 					if (length !== 256) throw new Error('length ' + length + ' not supported');
-					return Promise.resolve(_dukEnclaveNative.ecdhDeriveBits(algorithm.public.raw, baseKey.raw));
+					var bitsLE = _dukEnclaveNative.ecdhDeriveBits(algorithm.public.raw, baseKey.raw);
+					var bits = new ArrayBuffer(32);
+					reverse256(new Uint8Array(bits, 0, 32), new Uint8Array(bitsLE, 0, 32));
+					return Promise.resolve(bits);
 				default:
 					throw new Error('algorithm ' + algorithm.name + ' not supported');
 				}
