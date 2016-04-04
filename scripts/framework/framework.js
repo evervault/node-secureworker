@@ -217,7 +217,7 @@ var crypto = (function () {
 					if (format !== 'raw') throw new Error('format ' + format + ' not supported');
 					if (keyData.length !== 16) throw new Error('wrong keyData length');
 					result.type = 'secret';
-					result.raw = keyData.slice().buffer;
+					result.raw = new Uint8Array(keyData).buffer;
 					break;
 				case 'ECDH':
 				case 'ECDSA':
@@ -265,7 +265,7 @@ var crypto = (function () {
 				case 'AES-CTR':
 				case 'AES-CMAC':
 					if (format !== 'raw') throw new Error('format ' + format + ' not supported');
-					result = key.raw.slice();
+					result = new Uint8Array(new Uint8Array(key.raw)).buffer;
 					break;
 				case 'ECDH':
 				case 'ECDSA':
