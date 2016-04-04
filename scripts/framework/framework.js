@@ -80,7 +80,7 @@ var crypto = (function () {
 	};
 	var crypto = {
 		getRandomValues: function (array) {
-			throw new Error('getRandomValues not supported');
+			return _dukEnclaveNative.getRandomValues(array);
 		},
 		subtle: {
 			encrypt: function (algorithm, key, data) {
