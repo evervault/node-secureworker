@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "subtle": "https://github.com/mitar/subtle/tarball/4bca65159ad1cb27bbcecae41236ee78d980a675",
-    "promise-polyfill": "5.0.0",
+    "promise-polyfill": "https://github.com/mitar/promise-polyfill/tarball/a81db398e1ab052406c77130d060630ee81af3ed",
     "prebuild": "^2.9.0"
   },
   "scripts": {
