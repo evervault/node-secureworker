@@ -5,7 +5,7 @@
     "node": ">=0.10.33"
   },
   "dependencies": {
-    "subtle": "https://github.com/mitar/subtle/tarball/480cdafbafb58bb8167e83731cb4193bc84bef6b",
+    "subtle": "https://github.com/mitar/subtle/tarball/dc09fcaca859829f70de2ed6d8a5ff6c4617d79a",
     "promise-polyfill": "https://github.com/mitar/promise-polyfill/tarball/a81db398e1ab052406c77130d060630ee81af3ed",
     "prebuild": "^2.9.0"
   },
