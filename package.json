@@ -5,7 +5,7 @@
     "node": ">=0.10.33"
   },
   "dependencies": {
-    "node-webcrypto-ossl": "https://github.com/mitar/node-webcrypto-ossl/tarball/460d2955deb34430fc5e7e8b94a26a23914d96cf",
+    "node-webcrypto-ossl": "https://github.com/mitar/node-webcrypto-ossl/tarball/60d4d4c815f218c23c078c82e5ba4558aa52f39e",
     "promise-polyfill": "https://github.com/mitar/promise-polyfill/tarball/a81db398e1ab052406c77130d060630ee81af3ed",
     "prebuild": "^2.9.0"
   },
