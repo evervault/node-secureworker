@@ -2,10 +2,10 @@
   "name": "secureworker",
   "version": "0.1.0",
   "engines": {
-    "node": ">=0.10.33"
+    "node": "5.1.0"
   },
   "dependencies": {
-    "node-webcrypto-ossl": "https://github.com/mitar/node-webcrypto-ossl/tarball/e5e21b33a37ddc8215e0aaaa3bbd90fac44b3ce8",
+    "node-webcrypto-ossl": "^1.0.19",
     "promise-polyfill": "^5.2.0",
     "prebuild": "^2.9.0"
   },
