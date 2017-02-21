@@ -1,8 +1,8 @@
 var SecureWorker = require('../lib/index');
 
 function worker() {
-  F.onMessage(function (message) {
-    F.postMessage(message + 1);
+  SecureWorker.onMessage(function (message) {
+    SecureWorker.postMessage(message + 1);
   });
 }
 
