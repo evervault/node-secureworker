@@ -6,10 +6,10 @@ var console = {
 	},
 };
 
-var F = (function () {
-	var F = {};
+var SecureWorker = (function () {
+	var SecureWorker = {};
 	var alreadyImportedScripts = [];
-	F.importScripts = function (/* args */) {
+	SecureWorker.importScripts = function (/* args */) {
 		for (var i = 0; i < arguments.length; i++) {
 			var contentKey = arguments[i];
 			if (alreadyImportedScripts.indexOf(contentKey) !== -1) continue;
@@ -21,15 +21,15 @@ var F = (function () {
 			}
 		}
 	};
-	F.postMessage = function (message) {
+	SecureWorker.postMessage = function (message) {
 		var marshalledMessage = JSON.stringify(message);
 		_dukEnclaveNative.postMessage(marshalledMessage);
 	};
 	var messageHandlers = [];
-	F.onMessage = function (callback) {
+	SecureWorker.onMessage = function (callback) {
 		messageHandlers.push(callback);
 	};
-	F.removeOnMessage = function (callback) {
+	SecureWorker.removeOnMessage = function (callback) {
 		var index = messageHandlers.indexOf(callback);
 		if (index === -1) return;
 		messageHandlers.splice(index, 1);
@@ -45,8 +45,8 @@ var F = (function () {
 			}
 		}
 	};
-	F.ready = Promise.resolve();
-	return F;
+	SecureWorker.ready = Promise.resolve();
+	return SecureWorker;
 })();
 
 var crypto = (function () {
