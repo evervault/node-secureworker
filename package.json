@@ -5,7 +5,7 @@
     "node": "5.1.0"
   },
   "dependencies": {
-    "node-webcrypto-ossl": "^1.0.19",
+    "node-webcrypto-ossl": "git://github.com/mitar/node-webcrypto-ossl.git#82f4eca9cbbb61dfb7b2e642d79e08f79750eaed",
     "promise-polyfill": "^5.2.0",
     "prebuild": "^2.9.0"
   },
