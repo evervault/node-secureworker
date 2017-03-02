@@ -18,7 +18,7 @@ Then you can build it in Visual Studio.
 var SecureWorkerInternal = require('./Release/secureworker_internal');
 // Pass the location of the enclave DLL.
 var wi = new SecureWorkerInternal('./Debug/duk_enclave.signed.dll');
-wi.handlePostMesage = function (message) {
+wi.handlePostMessage = function (message) {
   console.log('from wi:', message);
 };
 // Pass the index of the script to run.
