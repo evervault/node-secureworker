@@ -1,16 +1,31 @@
 {
   "name": "secureworker",
   "version": "0.1.0",
-  "engines": {
-    "node": "5.1.0"
+  "description": "Run JavaScript inside an Intel SGX enclave",
+  "main": "./lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luckychain/node-secureworker.git"
+  },
+  "keywords": [
+    "sgx",
+    "enclave",
+    "worker"
+  ],
+  "scripts": {
+    "install": "prebuild --no-compile --download https://github.com/mitar/node-releases/releases/download/0.0.1/secureworker-v0.0.1.tar.gz"
   },
   "dependencies": {
     "node-webcrypto-ossl": "^1.0.20",
     "promise-polyfill": "^5.2.0",
     "prebuild": "^2.9.0"
   },
-  "scripts": {
-    "install": "prebuild --no-compile --download https://github.com/mitar/node-releases/releases/download/0.0.1/secureworker-v0.0.1.tar.gz"
+  "engines": {
+    "node": "6.10.0"
   },
-  "main": "./lib/index.js"
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/luckychain/node-secureworker/issues"
+  },
+  "homepage": "https://github.com/luckychain/node-secureworker"
 }
