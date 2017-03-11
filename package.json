@@ -18,6 +18,8 @@
   "dependencies": {
     "node-webcrypto-ossl": "^1.0.20",
     "promise-polyfill": "^6.0.2",
+    "node-uuid": "^1.4.7",
+    "int64-buffer": "^0.1.9",
     "prebuild": "^2.9.0"
   },
   "engines": {
