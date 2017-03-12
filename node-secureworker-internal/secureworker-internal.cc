@@ -225,7 +225,7 @@ NAN_METHOD(SecureWorkerInternal::BootstrapMock) {
 	info.GetReturnValue().Set(out_buffer);
 }
 
-static void secureworker_internal_init(v8::Local<v8::Object> exports) {
+static void secureworker_internal_init(v8::Local<v8::Object> exports, v8::Local<v8::Object> module) {
 	v8::Local<v8::FunctionTemplate> function_template = Nan::New<v8::FunctionTemplate>(SecureWorkerInternal::New);
 
 	function_template->SetClassName(Nan::New("SecureWorkerInternal").ToLocalChecked());
@@ -239,7 +239,7 @@ static void secureworker_internal_init(v8::Local<v8::Object> exports) {
 
   SecureWorkerInternal::constructor.Reset(Nan::GetFunction(function_template).ToLocalChecked());
 
-  Nan::Set(exports, Nan::New("SecureWorkerInternal").ToLocalChecked(), Nan::GetFunction(function_template).ToLocalChecked());
+  Nan::Set(module, Nan::New("exports").ToLocalChecked(), Nan::GetFunction(function_template).ToLocalChecked());
 }
 
 void duk_enclave_post_message(const char *message) {
