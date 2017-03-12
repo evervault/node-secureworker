@@ -5,7 +5,6 @@
 			"sources": [
 				"node-secureworker-internal/secureworker-internal.cc",
 				"../duk_enclave/duk_enclave_u.o",
-				"<!(node -e \"require('nan')\")",
 			],
 			"cflags": [
 				"-std=c++11",
@@ -17,6 +16,7 @@
 			"include_dirs": [
 				"$(SGX_SDK)/include",
 				"duk_enclave",
+				"<!(node -e \"require('nan')\")",
 			],
 			"link_settings": {
 				"libraries": [
