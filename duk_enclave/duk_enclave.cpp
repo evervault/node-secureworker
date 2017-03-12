@@ -23,7 +23,7 @@ static void *get_buffer_data_notnull(duk_context *ctx, duk_idx_t index, duk_size
 }
 
 static const duk_enclave_script_t *look_up_script(const char *key) {
-	for (size_t i = 0; i < MAX_SCRIPT; i++) {
+	for (size_t i = 0; i < SCRIPTS_LENGTH; i++) {
 		if (!strcmp(key, SCRIPTS[i].key)) return &SCRIPTS[i];
 	}
 	return NULL;

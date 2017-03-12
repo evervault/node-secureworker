@@ -25,7 +25,7 @@ endif
 
 ifeq ($(SGX_DEBUG), 1)
 ifeq ($(SGX_PRERELEASE), 1)
-$(error Cannot set SGX_DEBUG and SGX_PRERELEASE at the same time!!)
+	$(error Cannot set SGX_DEBUG and SGX_PRERELEASE at the same time!!)
 endif
 endif
 
@@ -64,9 +64,6 @@ endif
 App_Cpp_Flags := $(App_C_Flags) -std=c++11
 App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread -l$(Uae_Service_Library_Name)
 
-ifneq ($(SGX_MODE), HW)
-endif
-
 ######## Enclave Settings ########
 
 ifneq ($(SGX_MODE), HW)
@@ -93,81 +90,111 @@ Enclave_Link_Flags := $(SGX_COMMON_CFLAGS) -Wl,--no-undefined -nostdlib -nodefau
 ifeq ($(SGX_MODE), HW)
 ifneq ($(SGX_DEBUG), 1)
 ifneq ($(SGX_PRERELEASE), 1)
-Build_Mode = HW_RELEASE
+	Build_Mode = HW_RELEASE
 endif
 endif
 endif
+
+define DEFAULT_ENCLAVE_CONFIG
+<EnclaveConfiguration>
+  <ProdID>0</ProdID>
+  <ISVSVN>0</ISVSVN>
+  <StackMaxSize>0x40000</StackMaxSize>
+  <HeapMaxSize>0x100000</HeapMaxSize>
+  <TCSNum>1</TCSNum>
+  <TCSPolicy>1</TCSPolicy>
+  <DisableDebug>0</DisableDebug>
+  <MiscSelect>0</MiscSelect>
+  <MiscMask>0xFFFFFFFF</MiscMask>
+</EnclaveConfiguration>
+endef
+export DEFAULT_ENCLAVE_CONFIG
 
 ######## node-secureworker ########
 
-all: duk_enclave/duk_enclave.signed.so sample-client/sample-client build/Release/secureworker_internal.node secureworker-v0.0.1.tar.gz duk_enclave_builder.tar.gz
+all: build/Release/secureworker_internal.node
+
+%_u.c %_u.h: %.edl
+	cd $(<D) && $(SGX_EDGER8R) --untrusted $(<F) --search-path $(SGX_SDK)/include
 
 duktape_dist_c := $(wildcard duktape-1.4.0/src-separate/*.c)
 duktape_dist_o := $(duktape_dist_c:.c=.o)
 
-duktape-1.4.0/src-separate/%.o: CXXFLAGS+=$(Enclave_Cpp_Flags) -DDUK_OPT_NO_FILE_IO -DDUK_OPT_CPP_EXCEPTIONS -DDUK_OPT_NO_JX
+duktape-1.4.0/src-separate/%.o: CXXFLAGS += $(Enclave_Cpp_Flags) -DDUK_OPT_NO_FILE_IO -DDUK_OPT_CPP_EXCEPTIONS -DDUK_OPT_NO_JX
 duktape-1.4.0/src-separate/%.o: duktape-1.4.0/src-separate/%.c
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
 
-duktape-1.4.0/libduktape.a: $(duktape_dist_o)
-	ar -rcs $@ $^
+duk_enclave/duk_enclave_u.o: CFLAGS += $(App_C_Flags)
 
-scripts_js := $(wildcard scripts/framework/*.js scripts/*.js)
+build/Release/secureworker_internal.node: export SGX_SDK := $(SGX_SDK)
+build/Release/secureworker_internal.node: export SGX_LIBRARY_PATH := $(SGX_LIBRARY_PATH)
+build/Release/secureworker_internal.node: export SGX_URTS_LIBRARY_NAME := $(Urts_Library_Name)
+build/Release/secureworker_internal.node: export SGX_SERVICE_LIBRARY_NAME := $(Service_Library_Name)
+build/Release/secureworker_internal.node: node-secureworker-internal/secureworker-internal.cc duk_enclave/duk_enclave_u.h duk_enclave/duk_enclave_u.o
+	node-gyp rebuild
 
-scripts/scripts-binary.o: $(scripts_js)
-	cd scripts && ld -r -b binary $(patsubst scripts/%,%,$^) -o scripts-binary.o
+######## enclave building ########
 
-scripts/scripts-table.o: scripts/scripts.h
+# Example:
+#
+#   make build SCRIPTS='tests/main.js another/script.js' ENCLAVE_KEY='key.pem' ENCLAVE_OUTPUT='enclave-main.so'
+#
+# Scripts will be exposed as "main.js" and "script.js" inside the enclave (their basename).
+# Enclave key will be generated for you, if it does not yet exist.
+# If you do not provide ENCLAVE_OUTPUT, enclave will be output to "build/enclave.so".
 
-duk_enclave/duk_enclave_private.pem:
-	openssl genrsa -out $@ -3 3072
+ENCLAVE_OUTPUT ?= build/enclave.so
+ENCLAVE_OUTPUT_UNSIGNED ?= build/enclave.unsigned.so
+ENCLAVE_CONFIG ?= build/enclave.config.xml
+
+# A rule to check if output from generate-scripts-table changed based on SCRIPTS. Quietly.
+scripts/scripts-table.c.changed: scripts/generate-scripts-table.sh always-rebuild
+	@scripts/generate-scripts-table.sh enclave-autoexec/autoexec.js ${SCRIPTS} > $@.tmp
+	@[ -e $@ ] && diff -q $@ $@.tmp > /dev/null || cp $@.tmp $@
+	@rm -f $@.tmp
+
+scripts/scripts-table.c: scripts/generate-scripts-table.sh scripts/scripts-table.c.changed
+	@if [ -z "${SCRIPTS}" ]; then echo "You have to pass list of SCRIPTS to build into the enclave: make build SCRIPTS='worker1.js worker2.js'"; exit 1; fi
+	scripts/generate-scripts-table.sh enclave-autoexec/autoexec.js ${SCRIPTS} > $@
+
+scripts/scripts-binary.o: enclave-autoexec/autoexec.js ${SCRIPTS}
+	ld -r -b binary enclave-autoexec/autoexec.js ${SCRIPTS} -o $@
+
+scripts/scripts-table.o: scripts/scripts-table.c scripts/scripts.h
 
 %_t.c %_t.h: %.edl
 	cd $(<D) && $(SGX_EDGER8R) --trusted $(<F) --search-path $(SGX_SDK)/include
 
 duk_enclave/duk_enclave_t.o: CFLAGS += $(Enclave_C_Flags)
 
-%_u.c %_u.h: %.edl
-	cd $(<D) && $(SGX_EDGER8R) --untrusted $(<F) --search-path $(SGX_SDK)/include
-
-duk_enclave/duk_enclave_u.o: CFLAGS += $(App_C_Flags)
+duktape-1.4.0/libduktape.a: $(duktape_dist_o)
+	ar -rcs $@ $^
 
 duk_enclave/duk_enclave.o: CXXFLAGS += $(Enclave_Cpp_Flags) -Iduktape-1.4.0/src-separate -Iscripts
 duk_enclave/duk_enclave.o: duk_enclave/duk_enclave_t.h duktape-1.4.0/src-separate/duktape.h scripts/scripts.h
 
-duk_enclave/duk_enclave.so: LDLIBS += $(Enclave_Link_Flags)
-duk_enclave/duk_enclave.so: scripts/scripts-binary.o scripts/scripts-table.o duk_enclave/duk_enclave_t.o duk_enclave/duk_enclave.o duktape-1.4.0/libduktape.a
+${ENCLAVE_OUTPUT_UNSIGNED}: LDLIBS += $(Enclave_Link_Flags)
+${ENCLAVE_OUTPUT_UNSIGNED}: scripts/scripts-binary.o scripts/scripts-table.o duk_enclave/duk_enclave_t.o duk_enclave/duk_enclave.o duktape-1.4.0/libduktape.a
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-duk_enclave/duk_enclave.signed.so: duk_enclave/duk_enclave.so duk_enclave/duk_enclave_private.pem duk_enclave/duk_enclave.config.xml
+${ENCLAVE_OUTPUT}: ${ENCLAVE_OUTPUT_UNSIGNED} ${ENCLAVE_KEY} ${ENCLAVE_CONFIG}
+	@if [ -z "${ENCLAVE_KEY}" ]; then echo "You have to pass the ENCLAVE_KEY: make build ENCLAVE_KEY='key.pem'"; exit 1; fi
 	$(SGX_ENCLAVE_SIGNER) sign \
-		-key duk_enclave/duk_enclave_private.pem \
+		-key ${ENCLAVE_KEY} \
 		-enclave $< \
 		-out $@ \
-		-config duk_enclave/duk_enclave.config.xml
+		-config ${ENCLAVE_CONFIG}
 
-sample-client/sample-client.o: CXXFLAGS += $(App_Cpp_Flags) -Iduk_enclave
-sample-client/sample-client.o: duk_enclave/duk_enclave_u.h
+${ENCLAVE_KEY}:
+	@echo "Generating a signing key and storing it into '${ENCLAVE_KEY}'."
+	openssl genrsa -out $@ -3 3072
 
-sample-client/sample-client: LDLIBS += $(App_Link_Flags)
-sample-client/sample-client: duk_enclave/duk_enclave_u.o sample-client/sample-client.o
-	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
+${ENCLAVE_CONFIG}:
+	@echo "Storing a default enclave signing configuration into '${ENCLAVE_CONFIG}'."
+	echo "$$DEFAULT_ENCLAVE_CONFIG" > $@
 
-build:
-	node-gyp configure
+build: ${ENCLAVE_OUTPUT}
 
-build/Release/secureworker_internal.node: export SGX_SDK := $(SGX_SDK)
-build/Release/secureworker_internal.node: export SGX_LIBRARY_PATH := $(SGX_LIBRARY_PATH)
-build/Release/secureworker_internal.node: export SGX_URTS_LIBRARY_NAME := $(Urts_Library_Name)
-build/Release/secureworker_internal.node: export SGX_SERVICE_LIBRARY_NAME := $(Service_Library_Name)
-build/Release/secureworker_internal.node: node-secureworker-internal/secureworker-internal.cc duk_enclave/duk_enclave_u.h duk_enclave/duk_enclave_u.o | build
-	node-gyp build
-
-secureworker-v0.0.1.tar.gz: build/Release/secureworker_internal.node
-	tar -czf $@ $^
-
-duk_enclave_builder.tar.gz: duk_enclave/duk_enclave.config.xml duk_enclave/duk_enclave.o duk_enclave/duk_enclave_t.o duktape-1.4.0/libduktape.a scripts/scripts.h dist-files/build_enclave
-	tar -czf $@ $^
-
-.PHONY: all
+.PHONY: all build always-rebuild
 .SECONDARY: duk_enclave/duk_enclave_t.c duk_enclave/duk_enclave_t.h duk_enclave/duk_enclave_u.c duk_enclave/duk_enclave_u.h
+.PRECIOUS: %.key %.config.xml
