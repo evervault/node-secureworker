@@ -13,15 +13,17 @@
     "worker"
   ],
   "scripts": {
-    "install": "prebuild --no-compile --download https://github.com/mitar/node-releases/releases/download/0.0.1/secureworker-v0.0.1.tar.gz"
+    "build": "make",
+    "install": "make || true",
+    "test": "make test"
   },
   "dependencies": {
     "node-webcrypto-ossl": "^1.0.20",
     "promise-polyfill": "^6.0.2",
     "node-uuid": "^1.4.7",
     "int64-buffer": "^0.1.9",
-    "prebuild": "^2.9.0",
-    "nan": "^2.5.1"
+    "nan": "^2.5.1",
+    "browserify": "^14.1.0"
   },
   "engines": {
     "node": "6.10.0"

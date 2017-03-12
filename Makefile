@@ -112,7 +112,7 @@ export DEFAULT_ENCLAVE_CONFIG
 
 ######## node-secureworker ########
 
-all: build/Release/secureworker_internal.node
+all: build/Release/secureworker_internal.node enclave-autoexec/autoexec.js
 
 %_u.c %_u.h: %.edl
 	cd $(<D) && $(SGX_EDGER8R) --untrusted $(<F) --search-path $(SGX_SDK)/include
@@ -132,6 +132,9 @@ build/Release/secureworker_internal.node: export SGX_URTS_LIBRARY_NAME := $(Urts
 build/Release/secureworker_internal.node: export SGX_SERVICE_LIBRARY_NAME := $(Service_Library_Name)
 build/Release/secureworker_internal.node: node-secureworker-internal/secureworker-internal.cc duk_enclave/duk_enclave_u.h duk_enclave/duk_enclave_u.o
 	node-gyp rebuild
+
+enclave-autoexec/autoexec.js: enclave-autoexec/index.js node_modules/promise-polyfill/promise.js
+	./node_modules/.bin/browserify --insert-global-vars __filename,__dirname --no-commondir $^ > $@
 
 ######## enclave building ########
 
