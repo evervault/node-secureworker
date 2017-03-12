@@ -13,8 +13,8 @@
     "worker"
   ],
   "scripts": {
-    "build": "make",
-    "install": "make || true",
+    "build": "make node",
+    "install": "make node || true",
     "test": "make test"
   },
   "dependencies": {

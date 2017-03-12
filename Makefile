@@ -112,7 +112,10 @@ export DEFAULT_ENCLAVE_CONFIG
 
 ######## node-secureworker ########
 
-all: build/Release/secureworker_internal.node enclave-autoexec/autoexec.js
+all:
+	@echo 'Run "npm run build" or "make enclave".'
+
+node: build/Release/secureworker_internal.node enclave-autoexec/autoexec.js
 
 %_u.c %_u.h: %.edl
 	cd $(<D) && $(SGX_EDGER8R) --untrusted $(<F) --search-path $(SGX_SDK)/include
@@ -126,11 +129,14 @@ duktape-1.4.0/src-separate/%.o: duktape-1.4.0/src-separate/%.c
 
 duk_enclave/duk_enclave_u.o: CFLAGS += $(App_C_Flags)
 
+build:
+	@mkdir -p build
+
 build/Release/secureworker_internal.node: export SGX_SDK := $(SGX_SDK)
 build/Release/secureworker_internal.node: export SGX_LIBRARY_PATH := $(SGX_LIBRARY_PATH)
 build/Release/secureworker_internal.node: export SGX_URTS_LIBRARY_NAME := $(Urts_Library_Name)
 build/Release/secureworker_internal.node: export SGX_SERVICE_LIBRARY_NAME := $(Service_Library_Name)
-build/Release/secureworker_internal.node: node-secureworker-internal/secureworker-internal.cc duk_enclave/duk_enclave_u.h duk_enclave/duk_enclave_u.o
+build/Release/secureworker_internal.node: node-secureworker-internal/secureworker-internal.cc duk_enclave/duk_enclave_u.h duk_enclave/duk_enclave_u.o | build
 	node-gyp rebuild
 
 enclave-autoexec/autoexec.js: enclave-autoexec/index.js node_modules/promise-polyfill/promise.js
@@ -140,7 +146,7 @@ enclave-autoexec/autoexec.js: enclave-autoexec/index.js node_modules/promise-pol
 
 # Example:
 #
-#   make build SCRIPTS='tests/main.js another/script.js' ENCLAVE_KEY='key.pem' ENCLAVE_OUTPUT='enclave-main.so'
+#   make enclave SCRIPTS='tests/main.js another/script.js' ENCLAVE_KEY='key.pem' ENCLAVE_OUTPUT='enclave-main.so'
 #
 # Scripts will be exposed as "main.js" and "script.js" inside the enclave (their basename).
 # Enclave key will be generated for you, if it does not yet exist.
@@ -149,6 +155,7 @@ enclave-autoexec/autoexec.js: enclave-autoexec/index.js node_modules/promise-pol
 ENCLAVE_OUTPUT ?= build/enclave.so
 ENCLAVE_OUTPUT_UNSIGNED ?= build/enclave.unsigned.so
 ENCLAVE_CONFIG ?= build/enclave.config.xml
+ENCLAVE_KEY ?= key.pem
 
 # A rule to check if output from generate-scripts-table changed based on SCRIPTS. Quietly.
 scripts/scripts-table.c.changed: scripts/generate-scripts-table.sh always-rebuild
@@ -157,7 +164,7 @@ scripts/scripts-table.c.changed: scripts/generate-scripts-table.sh always-rebuil
 	@rm -f $@.tmp
 
 scripts/scripts-table.c: scripts/generate-scripts-table.sh scripts/scripts-table.c.changed
-	@if [ -z "${SCRIPTS}" ]; then echo "You have to pass list of SCRIPTS to build into the enclave: make build SCRIPTS='worker1.js worker2.js'"; exit 1; fi
+	@if [ -z "${SCRIPTS}" ]; then echo "You have to pass list of SCRIPTS to build into the enclave: make enclave SCRIPTS='worker1.js worker2.js'"; exit 1; fi
 	scripts/generate-scripts-table.sh enclave-autoexec/autoexec.js ${SCRIPTS} > $@
 
 scripts/scripts-binary.o: enclave-autoexec/autoexec.js ${SCRIPTS}
@@ -181,7 +188,6 @@ ${ENCLAVE_OUTPUT_UNSIGNED}: scripts/scripts-binary.o scripts/scripts-table.o duk
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 ${ENCLAVE_OUTPUT}: ${ENCLAVE_OUTPUT_UNSIGNED} ${ENCLAVE_KEY} ${ENCLAVE_CONFIG}
-	@if [ -z "${ENCLAVE_KEY}" ]; then echo "You have to pass the ENCLAVE_KEY: make build ENCLAVE_KEY='key.pem'"; exit 1; fi
 	$(SGX_ENCLAVE_SIGNER) sign \
 		-key ${ENCLAVE_KEY} \
 		-enclave $< \
@@ -196,7 +202,7 @@ ${ENCLAVE_CONFIG}:
 	@echo "Storing a default enclave signing configuration into '${ENCLAVE_CONFIG}'."
 	echo "$$DEFAULT_ENCLAVE_CONFIG" > $@
 
-build: ${ENCLAVE_OUTPUT}
+enclave: build ${ENCLAVE_OUTPUT}
 
 .PHONY: all build always-rebuild
 .SECONDARY: duk_enclave/duk_enclave_t.c duk_enclave/duk_enclave_t.h duk_enclave/duk_enclave_u.c duk_enclave/duk_enclave_u.h
