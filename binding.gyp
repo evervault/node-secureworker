@@ -5,6 +5,7 @@
 			"sources": [
 				"node-secureworker-internal/secureworker-internal.cc",
 				"../duk_enclave/duk_enclave_u.o",
+				"<!(node -e \"require('nan')\")",
 			],
 			"cflags": [
 				"-std=c++11",

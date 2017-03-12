@@ -20,7 +20,8 @@
     "promise-polyfill": "^6.0.2",
     "node-uuid": "^1.4.7",
     "int64-buffer": "^0.1.9",
-    "prebuild": "^2.9.0"
+    "prebuild": "^2.9.0",
+    "nan": "^2.5.1"
   },
   "engines": {
     "node": "6.10.0"
