@@ -153,7 +153,7 @@ enclave-autoexec/autoexec.js: enclave-autoexec/index.js node_modules/promise-pol
 # If you do not provide ENCLAVE_OUTPUT, enclave will be output to "build/enclave.so".
 
 ENCLAVE_OUTPUT ?= build/enclave.so
-ENCLAVE_OUTPUT_UNSIGNED ?= build/enclave.unsigned.so
+ENCLAVE_OUTPUT_UNSIGNED ?= $(addsuffix $(addprefix .unsigned,$(suffix $(ENCLAVE_OUTPUT))),$(basename $(ENCLAVE_OUTPUT)))
 ENCLAVE_CONFIG ?= build/enclave.config.xml
 ENCLAVE_KEY ?= key.pem
 
