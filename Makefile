@@ -167,8 +167,18 @@ scripts/scripts-table.c: scripts/generate-scripts-table.sh scripts/scripts-table
 	@if [ -z "${SCRIPTS}" ]; then echo "You have to pass list of SCRIPTS to build into the enclave: make enclave SCRIPTS='worker1.js worker2.js'"; exit 1; fi
 	scripts/generate-scripts-table.sh enclave-autoexec/autoexec.js ${SCRIPTS} > $@
 
-scripts/scripts-binary.o: enclave-autoexec/autoexec.js ${SCRIPTS}
-	ld -r -b binary enclave-autoexec/autoexec.js ${SCRIPTS} -o $@
+# A rule to check if output from generate-scripts-data changed based on SCRIPTS. Quietly.
+scripts/scripts-binary.as.changed: scripts/generate-scripts-data.sh always-rebuild
+	@scripts/generate-scripts-data.sh enclave-autoexec/autoexec.js ${SCRIPTS} > $@.tmp
+	@[ -e $@ ] && diff -q $@ $@.tmp > /dev/null || cp $@.tmp $@
+	@rm -f $@.tmp
+
+scripts/scripts-binary.as: scripts/generate-scripts-data.sh scripts/scripts-binary.as.changed
+	@if [ -z "${SCRIPTS}" ]; then echo "You have to pass list of SCRIPTS to build into the enclave: make enclave SCRIPTS='worker1.js worker2.js'"; exit 1; fi
+	scripts/generate-scripts-data.sh enclave-autoexec/autoexec.js ${SCRIPTS} > $@
+
+scripts/scripts-binary.o: scripts/scripts-binary.as
+	as $^ -o $@
 
 scripts/scripts-table.o: scripts/scripts-table.c scripts/scripts.h
 

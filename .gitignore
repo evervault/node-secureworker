@@ -258,4 +258,6 @@ _Pvt_Extensions
 
 scripts-table.c
 scripts-table.c.changed
+scripts-binary.as
+scripts-binary.as.changed
 enclave-autoexec/autoexec.js

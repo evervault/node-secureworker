@@ -18,18 +18,19 @@ for arg in "$@"; do
   esac
 done
 
+if [ ${#FILES[@]} -eq 0 ]; then
+  echo "No scripts provided."
+  exit 1
+fi
+
 cat <<EOF
 #include "scripts.h"
-#ifdef _WIN32
-#define BINARY(NAME) binary_ ## NAME
-#else
-#define BINARY(NAME) _binary_ ## NAME
-#endif
 EOF
 
 for file in "${FILES[@]}"; do
-  cleaned_file=$(echo -n "$file" | tr -c '[A-Za-z0-9]' '_')
-  echo "extern const char BINARY(${cleaned_file}_start)[], BINARY(${cleaned_file}_end)[];"
+  base_file=$(basename "$file")
+  cleaned_file=$(echo -n "$base_file" | tr -c '[A-Za-z0-9]' '_')
+  echo "extern const char _binary_${cleaned_file}_start[], _binary_${cleaned_file}_end[];"
 done
 
 echo "const size_t SCRIPTS_LENGTH = ${#FILES[@]};"
@@ -37,8 +38,8 @@ echo "const size_t SCRIPTS_LENGTH = ${#FILES[@]};"
 echo "const duk_enclave_script_t SCRIPTS[${#FILES[@]}] = {"
 for file in "${FILES[@]}"; do
   base_file=$(basename "$file")
-  cleaned_file=$(echo -n "$file" | tr -c '[A-Za-z0-9]' '_')
-  echo "  {\"${base_file}\", BINARY(${cleaned_file}_start), BINARY(${cleaned_file}_end)},"
+  cleaned_file=$(echo -n "$base_file" | tr -c '[A-Za-z0-9]' '_')
+  echo "  {\"${base_file}\", _binary_${cleaned_file}_start, _binary_${cleaned_file}_end},"
 done
 echo "};"
 
