@@ -29,11 +29,6 @@ var argv = require('yargs')
 
   .argv;
 
-if (!argv._.length) {
-  // TODO: How to specify this through yargs?
-  throw new Error("Scripts to include in enclave missing.");
-}
-
 var base = path.normalize(path.join(path.dirname(require.resolve('../lib/index.js')), '..'));
 
 child_process.execFileSync('make', [
