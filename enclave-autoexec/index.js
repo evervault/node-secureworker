@@ -176,6 +176,7 @@
             algorithm = normalizeAlgorithmShallow(algorithm);
             switch (algorithm.name) {
             case 'AES-GCM':
+              if (!algorithm.tagLength) algorithm.tagLength = 128;
               if (algorithm.tagLength !== 128) throw new Error('tagLength ' + algorithm.tagLength + ' not supported');
               return Promise.resolve(_dukEnclaveNative.aesgcmEncrypt(algorithm.iv, algorithm.additionalData, key.raw, data));
             case 'AES-CTR':
@@ -189,6 +190,7 @@
             algorithm = normalizeAlgorithmShallow(algorithm);
             switch (algorithm.name) {
             case 'AES-GCM':
+              if (!algorithm.tagLength) algorithm.tagLength = 128;
               if (algorithm.tagLength !== 128) throw new Error('tagLength ' + algorithm.tagLength + ' not supported');
               return Promise.resolve(_dukEnclaveNative.aesgcmDecrypt(algorithm.iv, algorithm.additionalData, key.raw, data));
             case 'AES-CTR':
