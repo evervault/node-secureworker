@@ -115,7 +115,7 @@ export DEFAULT_ENCLAVE_CONFIG
 all:
 	@echo 'Run "npm run build" or "make enclave".'
 
-node: build/Release/secureworker_internal.node enclave-autoexec/autoexec.js
+node: Makefile build/Release/secureworker_internal.node enclave-autoexec/autoexec.js
 
 %_u.c %_u.h: %.edl
 	cd $(<D) && $(SGX_EDGER8R) --untrusted $(<F) --search-path $(SGX_SDK)/include
@@ -202,7 +202,7 @@ ${ENCLAVE_CONFIG}:
 	@echo "Storing a default enclave signing configuration into '${ENCLAVE_CONFIG}'."
 	echo "$$DEFAULT_ENCLAVE_CONFIG" > $@
 
-enclave: build ${ENCLAVE_OUTPUT}
+enclave: Makefile build ${ENCLAVE_OUTPUT}
 
 .PHONY: all build always-rebuild
 .SECONDARY: duk_enclave/duk_enclave_t.c duk_enclave/duk_enclave_t.h duk_enclave/duk_enclave_u.c duk_enclave/duk_enclave_u.h
