@@ -29,6 +29,9 @@
     "browserify": "^14.1.0",
     "yargs": "^7.0.1"
   },
+  "devDependencies": {
+    "underscore": "^1.8.3"
+  },
   "engines": {
     "node": "6.10.0"
   },

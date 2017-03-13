@@ -107,7 +107,5 @@ SecureWorker.ready.then(function () {
 }).then(passed("monotonic counters")).catch(report("monotonic counters"));
 
 SecureWorker.ready.then(function () {
-  SecureWorker.importScripts('test-time.js');
+  SecureWorker.importScripts('test-commands.js');
 }).then(passed("import scripts")).catch(report("import scripts"));
-
-// TODO: Test getReport.

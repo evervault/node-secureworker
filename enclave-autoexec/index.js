@@ -114,9 +114,9 @@
         return _dukEnclaveNative.getTime();
       },
 
-      // Returns the report as arraybuffer. reportData is 64 bytes of extra information, arraybuffer.
-      getReport: function getReport(reportData) {
-        throw new Error("Not implemented.");
+      // Returns the report as arraybuffer. targetInfo is 512 bytes. reportData is 64 bytes of extra information, arraybuffer.
+      getReport: function getReport(targetInfo, reportData) {
+        return _dukEnclaveNative.getReport(targetInfo, reportData);
       }
     };
 

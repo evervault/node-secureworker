@@ -9,6 +9,15 @@ function toBase64(data) {
   }
 }
 
+function fromBase64(string) {
+  if (typeof Duktape !== 'undefined') {
+    return new Uint8Array(Duktape.dec('base64', string)).buffer;
+  }
+  else {
+    return new Uint8Array(new Buffer(string, 'base64').values()).buffer;
+  }
+}
+
 SecureWorker.onMessage(function (message) {
   if (message.command !== 'time') return;
 
@@ -18,5 +27,14 @@ SecureWorker.onMessage(function (message) {
     command: 'time',
     currentTime: toBase64(time.currentTime),
     timeSourceNonce: toBase64(time.timeSourceNonce)
+  })
+});
+
+SecureWorker.onMessage(function (message) {
+  if (message.command !== 'report') return;
+
+  SecureWorker.postMessage({
+    command: 'report',
+    report: toBase64(SecureWorker.getReport(fromBase64(message.targetInfo), message.reportData ? fromBase64(message.reportData) : null))
   })
 });

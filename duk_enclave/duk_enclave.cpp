@@ -255,6 +255,32 @@ static duk_ret_t native_read_monotonic_counter(duk_context *ctx) {
 	return 1;
 }
 
+static duk_ret_t native_get_report(duk_context *ctx) {
+  duk_require_type_mask(ctx, 0, DUK_TYPE_MASK_OBJECT);
+  duk_require_type_mask(ctx, 1, DUK_TYPE_MASK_NULL | DUK_TYPE_MASK_OBJECT);
+
+	duk_size_t target_info_size;
+	void * const target_info_array = duk_get_buffer_data(ctx, 0, &target_info_size);
+
+  if (target_info_size != sizeof(sgx_target_info_t)) return DUK_RET_ERROR;
+
+  void * report_data_array = NULL;
+  if (!duk_check_type(ctx, 1, DUK_TYPE_NULL)) {
+    duk_size_t report_data_size;
+    report_data_array = duk_get_buffer_data(ctx, 1, &report_data_size);
+
+    if (report_data_size != sizeof(sgx_report_data_t)) return DUK_RET_ERROR;
+  }
+
+	void * const report = duk_push_fixed_buffer(ctx, sizeof(sgx_report_t));
+	{
+		const sgx_status_t status = sgx_create_report(reinterpret_cast<const sgx_target_info_t *>(target_info_array), reinterpret_cast<const sgx_report_data_t *>(report_data_array), reinterpret_cast<sgx_report_t *>(report));
+		if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_create_report");
+	}
+	duk_push_buffer_object(ctx, -1, 0, sizeof(sgx_report_t), DUK_BUFOBJ_ARRAYBUFFER);
+	return 1;
+}
+
 static duk_ret_t native_get_random_values(duk_context *ctx) {
 	duk_size_t array_size;
 	void * const array = duk_get_buffer_data(ctx, 0, &array_size);
@@ -524,6 +550,7 @@ static const duk_function_list_entry native_methods[] = {
 	{"destroyMonotonicCounter", native_destroy_monotonic_counter, 1},
 	{"incrementMonotonicCounter", native_increment_monotonic_counter, 1},
 	{"readMonotonicCounter", native_read_monotonic_counter, 1},
+	{"getReport", native_get_report, 2},
 	{"getRandomValues", native_get_random_values, 1},
 	{"sha256Digest", native_sha256_digest, 1},
 	{"aesgcmEncrypt", native_aesgcm_encrypt, 4},

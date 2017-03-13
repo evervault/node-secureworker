@@ -212,7 +212,7 @@ ${ENCLAVE_CONFIG}:
 	@echo "Storing a default enclave signing configuration into '${ENCLAVE_CONFIG}'."
 	echo "$$DEFAULT_ENCLAVE_CONFIG" > $@
 
-enclave: Makefile build ${ENCLAVE_OUTPUT}
+enclave: node Makefile build ${ENCLAVE_OUTPUT}
 
 .PHONY: all build always-rebuild
 .SECONDARY: duk_enclave/duk_enclave_t.c duk_enclave/duk_enclave_t.h duk_enclave/duk_enclave_u.c duk_enclave/duk_enclave_u.h

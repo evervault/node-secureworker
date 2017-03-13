@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <iostream> // %%%
 #include <sstream>
+#include <string.h>
 
 #include "sgx_tseal.h"
 #include "sgx_uae_service.h"
@@ -62,11 +63,14 @@ public:
 	                   const uint8_t *additional_data, size_t additional_data_size,
 	                   const uint8_t *data, size_t data_size);
 
+  static void initQuote(sgx_target_info_t *target_info, sgx_epid_group_id_t *gid);
+
 	static Nan::Persistent<v8::Function> constructor;
 	static NAN_METHOD(New);
 	static NAN_METHOD(Init);
 	static NAN_METHOD(Close);
 	static NAN_METHOD(EmitMessage);
+	static NAN_METHOD(InitQuote);
 	static NAN_METHOD(BootstrapMock);
 };
 
@@ -116,6 +120,13 @@ void SecureWorkerInternal::bootstrapMock(sgx_sealed_data_t *out, size_t out_size
 	{
 		const sgx_status_t status = duk_enclave_bootstrap_mock(enclave_id, out, out_size, additional_data, additional_data_size, data, data_size);
 		if (status != SGX_SUCCESS) throw sgx_error(status, "duk_enclave_bootstrap_mock");
+	}
+}
+
+void SecureWorkerInternal::initQuote(sgx_target_info_t *target_info, sgx_epid_group_id_t *gid) {
+	{
+		const sgx_status_t status = sgx_init_quote(target_info, gid);
+		if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_init_quote");
 	}
 }
 
@@ -225,6 +236,36 @@ NAN_METHOD(SecureWorkerInternal::BootstrapMock) {
 	info.GetReturnValue().Set(out_buffer);
 }
 
+NAN_METHOD(SecureWorkerInternal::InitQuote) {
+  sgx_target_info_t target_info;
+  sgx_epid_group_id_t gid;
+
+	try {
+		SecureWorkerInternal::initQuote(&target_info, &gid);
+	} catch (sgx_error error) {
+		return error.rethrow();
+	}
+
+  v8::Local<v8::ArrayBuffer> target_info_buffer = v8::ArrayBuffer::New(v8::Isolate::GetCurrent(), sizeof(target_info));
+  v8::Local<v8::ArrayBuffer> gid_buffer = v8::ArrayBuffer::New(v8::Isolate::GetCurrent(), sizeof(gid));
+
+  v8::Local<v8::Uint8Array> target_info_array = v8::Uint8Array::New(target_info_buffer, 0, sizeof(target_info));
+  v8::Local<v8::Uint8Array> gid_array = v8::Uint8Array::New(gid_buffer, 0, sizeof(gid));
+
+  Nan::TypedArrayContents<uint8_t> target_info_uint8(target_info_array);
+  Nan::TypedArrayContents<uint8_t> gid_uint8(gid_array);
+
+  memcpy(*target_info_uint8, &target_info, sizeof(target_info));
+  memcpy(*gid_uint8, &gid, sizeof(gid));
+
+  v8::Local<v8::Object> result = Nan::New<v8::Object>();
+
+  Nan::Set(result, Nan::New("targetInfo").ToLocalChecked(), target_info_buffer);
+  Nan::Set(result, Nan::New("gid").ToLocalChecked(), gid_buffer);
+
+	info.GetReturnValue().Set(result);
+}
+
 static void secureworker_internal_init(v8::Local<v8::Object> exports, v8::Local<v8::Object> module) {
 	v8::Local<v8::FunctionTemplate> function_template = Nan::New<v8::FunctionTemplate>(SecureWorkerInternal::New);
 
@@ -236,6 +277,8 @@ static void secureworker_internal_init(v8::Local<v8::Object> exports, v8::Local<
 	Nan::SetPrototypeMethod(function_template, "emitMessage", SecureWorkerInternal::EmitMessage);
 	Nan::SetPrototypeMethod(function_template, "bootstrapMock", SecureWorkerInternal::BootstrapMock);
 	Nan::SetPrototypeTemplate(function_template, "handlePostMessage", Nan::Null());
+
+  Nan::SetMethod(function_template, "initQuote", SecureWorkerInternal::InitQuote);
 
   SecureWorkerInternal::constructor.Reset(Nan::GetFunction(function_template).ToLocalChecked());
 
