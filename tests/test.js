@@ -1,10 +1,20 @@
-var report = function (reason) {
-	console.log('Failed:', reason.stack || reason);
-	SecureWorker.postMessage({success: false});
+var report = function (name) {
+  return function (reason) {
+    console.log(name + ' failed:', reason.stack || reason);
+    SecureWorker.postMessage({success: false, name: name});
+  }
 };
 
-var passed = function () {
-	SecureWorker.postMessage({success: true});
+var passed = function (name) {
+  return function () {
+    SecureWorker.postMessage({success: true, name: name});
+  };
+};
+
+var assertEqual = function (name, value1, value2) {
+  if (value1 !== value2) {
+    throw new Error(name + " not equal");
+  }
 };
 
 var assertArraysEqual = function (name, array1, array2) {
@@ -77,6 +87,27 @@ SecureWorker.ready.then(function () {
 
     assertArraysEqual("decrypted encrypted clear text", clearText, result);
   });
-}).then(passed).catch(report);
+}).then(passed("crypto")).catch(report("crypto"));
 
-// TODO: Test whole SecureWorker API (importScripts, monotonic counters, trusted time, getReport).
+SecureWorker.ready.then(function () {
+  var counter = SecureWorker.monotonicCounters.create();
+
+  try {
+    var value = counter.value;
+
+    assertEqual("monotonic counter read", SecureWorker.monotonicCounters.read(counter.uuid), value);
+
+    assertEqual("monotonic counter increment", SecureWorker.monotonicCounters.increment(counter.uuid), value + 1);
+
+    assertEqual("monotonic counter read after increment", SecureWorker.monotonicCounters.read(counter.uuid), value + 1);
+  }
+  finally {
+    SecureWorker.monotonicCounters.destroy(counter.uuid);
+  }
+}).then(passed("monotonic counters")).catch(report("monotonic counters"));
+
+SecureWorker.ready.then(function () {
+  SecureWorker.importScripts('test-time.js');
+}).then(passed("import scripts")).catch(report("import scripts"));
+
+// TODO: Test getReport.
