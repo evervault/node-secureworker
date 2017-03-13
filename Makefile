@@ -140,7 +140,7 @@ build/Release/secureworker_internal.node: node-secureworker-internal/secureworke
 	node-gyp rebuild
 
 enclave-autoexec/autoexec.js: enclave-autoexec/index.js node_modules/promise-polyfill/promise.js
-	./node_modules/.bin/browserify --insert-global-vars __filename,__dirname --no-commondir $^ > $@
+	./node_modules/.bin/browserify --insert-global-vars __filename,__dirname --no-commondir $< > $@
 
 ######## enclave building ########
 
@@ -177,8 +177,8 @@ scripts/scripts-binary.as: scripts/generate-scripts-data.sh scripts/scripts-bina
 	@if [ -z "${SCRIPTS}" ]; then echo "You have to pass list of SCRIPTS to build into the enclave: make enclave SCRIPTS='worker1.js worker2.js'"; exit 1; fi
 	scripts/generate-scripts-data.sh enclave-autoexec/autoexec.js ${SCRIPTS} > $@
 
-scripts/scripts-binary.o: scripts/scripts-binary.as
-	as $^ -o $@
+scripts/scripts-binary.o: scripts/scripts-binary.as enclave-autoexec/autoexec.js $(SCRIPTS)
+	as $< -o $@
 
 scripts/scripts-table.o: scripts/scripts-table.c scripts/scripts.h
 

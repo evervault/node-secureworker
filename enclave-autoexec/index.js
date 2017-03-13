@@ -140,7 +140,7 @@
       };
 
       var normalizeBufferSource = function (src) {
-        return new Uint8Array(Duktape.Buffer(src), src.byteOffset, src.byteLength);
+        return new Uint8Array(Buffer(src), src.byteOffset, src.byteLength);
       };
 
       var equals128 = function (a, b) {

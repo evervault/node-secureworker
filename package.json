@@ -18,7 +18,7 @@
   "scripts": {
     "build": "make node",
     "install": "make node || true",
-    "test": "make test"
+    "test": "tests/run.js"
   },
   "dependencies": {
     "node-webcrypto-ossl": "^1.0.20",
