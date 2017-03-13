@@ -1,7 +1,4 @@
-var thirty_two = new Uint8Array(32);
-console.log('slice is', typeof thirty_two.slice); // %%%
-
-// Test vector from RFC 5903
+// Test vector from RFC 5903.
 var keyA = {
 	privateHex: 'C88F01F510D9AC3F70A292DAA2316DE544E9AAB8AFE84049C62A9C57862D1433',
 	publicHex: 'DAD0B65394221CF9B051E1FECA5787D098DFE637FC90B9EF945D0C37725811805271A0461CDB8252D61F1C456FA3E59AB1F45B33ACCF5F58389E0577B8990BB3',
@@ -17,6 +14,7 @@ var algorithm = {
 var report = function (reason) {
 	console.log('rejected:', reason.stack || reason);
 }
+
 Promise.all([
 	crypto.subtle.importKey('raw-private-be', Duktape.dec('hex', keyA.privateHex), algorithm, true, ['deriveBits']),
 	crypto.subtle.importKey('raw-public-uncompressed-be', Duktape.dec('hex', keyA.publicHex), algorithm, true, []),
@@ -46,29 +44,3 @@ Promise.all([
 		console.log('B <- A =', Duktape.enc('hex', Duktape.Buffer(result)));
 	}).catch(report);
 }).catch(report);
-
-/*
-var clear = new Uint8Array([1, 2, 3]);
-var sealed = _dukEnclaveNative.sealData(null, clear);
-var basic = Array.prototype.slice.call(new Uint8Array(sealed));
-SecureWorker.postMessage(basic);
-
-// Test vector from RFC 4754
-var rawKeyHex = '2442A5CC0ECD015FA3CA31DC8E2BBC70BF42D60CBCA20085E0822CB04235E9706FC98BD7E50211A4A27102FA3549DF79EBCB4BF246B80945CDDFE7D509BBFD7D';
-var publicKey = crypto.subtle.importKey('raw-public-uncompressed-be', Duktape.dec('hex', rawKeyHex), {
-	name: 'ECDSA',
-	namedCurve: 'P-256',
-}, true, ['verify']);
-SecureWorker.onMessage(function (message) {
-	publicKey.then(function (publicKey) {
-		return crypto.subtle.verify({
-			name: 'ECDSA',
-			hash: 'SHA-256',
-		}, publicKey, Duktape.dec('hex', message.signature), Duktape.dec('hex', message.data));
-	}).then(function (valid) {
-		SecureWorker.postMessage(valid);
-	}).catch(function (reason) {
-		console.log('rejected', reason.stack || reason);
-	});
-});
-*/
