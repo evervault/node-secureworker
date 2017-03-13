@@ -12,6 +12,9 @@
     "enclave",
     "worker"
   ],
+  "bin": {
+    "secureworker-create": "bin/build_enclave"
+  },
   "scripts": {
     "build": "make node",
     "install": "make node || true",
@@ -23,7 +26,8 @@
     "node-uuid": "^1.4.7",
     "int64-buffer": "^0.1.9",
     "nan": "^2.5.1",
-    "browserify": "^14.1.0"
+    "browserify": "^14.1.0",
+    "yargs": "^7.0.1"
   },
   "engines": {
     "node": "6.10.0"
