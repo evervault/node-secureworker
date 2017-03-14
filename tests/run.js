@@ -132,7 +132,6 @@ var realWorker = new RealSecureWorker('enclave.so', 'test.js');
     }
 
     try {
-      // TODO: Can spid for testing be just nulls?
       var quote = type.worker.constructor.getQuote(report, false, new ArrayBuffer(16));
 
       var quoteData = type.worker.constructor.getQuoteData(quote);

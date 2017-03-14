@@ -48,10 +48,13 @@ struct sgx_error {
   }
 };
 
-uint32_t arrayBufferLength(v8::Local<v8::Value> value) {
-  v8::Local<v8::Object> arrayBuffer = Nan::To<v8::Object>(value).ToLocalChecked();
-  v8::Local<v8::Value> length = Nan::Get(arrayBuffer, Nan::New("byteLength").ToLocalChecked()).ToLocalChecked();
-  return Nan::To<uint32_t>(length).FromJust();
+void arrayBufferData(v8::Local<v8::Value> input, uint8_t **data, size_t *size) {
+  v8::Local<v8::ArrayBuffer> buffer = input.As<v8::ArrayBuffer>();
+  v8::Local<v8::Uint8Array> array = v8::Uint8Array::New(buffer, 0, buffer->ByteLength());
+  Nan::TypedArrayContents<uint8_t> contents(array);
+
+  *data = *contents;
+  *size = buffer->ByteLength();
 }
 
 // The rest of the stuff, which is per-instance
@@ -235,23 +238,19 @@ NAN_METHOD(SecureWorkerInternal::EmitMessage) {
 NAN_METHOD(SecureWorkerInternal::BootstrapMock) {
   SecureWorkerInternal *secure_worker_internal = Nan::ObjectWrap::Unwrap<SecureWorkerInternal>(info.This());
 
+  uint8_t *additional_data;
   size_t additional_data_size;
-  const uint8_t *additional_data;
   if (info[0]->IsArrayBuffer()) {
-    Nan::TypedArrayContents<uint8_t> arg0_uint8(info[0]);
-    additional_data = *arg0_uint8;
-    additional_data_size = arrayBufferLength(info[0]);
+    arrayBufferData(info[0], &additional_data, &additional_data_size);
   } else {
     additional_data = nullptr;
     additional_data_size = 0;
   }
 
+  uint8_t *data;
   size_t data_size;
-  const uint8_t *data;
   if (info[1]->IsArrayBuffer()) {
-    Nan::TypedArrayContents<uint8_t> arg1_uint8(info[1]);
-    data = *arg1_uint8;
-    data_size = arrayBufferLength(info[1]);
+    arrayBufferData(info[1], &data, &data_size);
   } else {
     data = nullptr;
     data_size = 0;
@@ -312,12 +311,13 @@ NAN_METHOD(SecureWorkerInternal::GetQuote) {
   if (!info[0]->IsArrayBuffer()) {
     return Nan::ThrowTypeError("Argument 0 error");
   }
-  if (arrayBufferLength(info[0]) != sizeof(sgx_report_t)) {
+
+  sgx_report_t *report;
+  size_t report_size;
+  arrayBufferData(info[0], reinterpret_cast<uint8_t **>(&report), &report_size);
+  if (report_size != sizeof(sgx_report_t)) {
     return Nan::ThrowTypeError("Argument 0 error");
   }
-
-  Nan::TypedArrayContents<uint8_t> arg0_uint8(info[0]);
-  sgx_report_t *report = reinterpret_cast<sgx_report_t *>(*arg0_uint8);
 
   if (!info[1]->IsBoolean()) {
     return Nan::ThrowTypeError("Argument 1 error");
@@ -331,19 +331,18 @@ NAN_METHOD(SecureWorkerInternal::GetQuote) {
   if (!info[2]->IsArrayBuffer()) {
     return Nan::ThrowTypeError("Argument 2 error");
   }
-  if (arrayBufferLength(info[2]) != sizeof(sgx_spid_t)) {
+
+  sgx_spid_t *spid;
+  size_t spid_size;
+  arrayBufferData(info[2], reinterpret_cast<uint8_t **>(&spid), &spid_size);
+  if (spid_size != sizeof(sgx_spid_t)) {
     return Nan::ThrowTypeError("Argument 2 error");
   }
 
-  Nan::TypedArrayContents<uint8_t> arg2_uint8(info[2]);
-  sgx_spid_t *spid = reinterpret_cast<sgx_spid_t *>(*arg2_uint8);
-
-  uint32_t sig_rl_size;
-  const uint8_t *sig_rl;
+  uint8_t *sig_rl;
+  size_t sig_rl_size;
   if (info[3]->IsArrayBuffer()) {
-    Nan::TypedArrayContents<uint8_t> arg3_uint8(info[3]);
-    sig_rl = *arg0_uint8;
-    sig_rl_size = arrayBufferLength(info[3]);
+    arrayBufferData(info[3], &sig_rl, &sig_rl_size);
   } else {
     sig_rl = nullptr;
     sig_rl_size = 0;
