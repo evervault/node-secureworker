@@ -24,7 +24,7 @@ MockSecureWorker._resolveContentKey = function _resolveContentKey(enclaveName, c
 
 var RealSecureWorker = require('../lib/real.js');
 
-var ALL_TESTS = 5;
+var ALL_TESTS = 6;
 
 var testsPassed = 0;
 var testsFailed = 0;
@@ -125,13 +125,34 @@ var realWorker = new RealSecureWorker('enclave.so', 'test.js');
     if (_.isEqual(new Uint8Array(data), new Uint8Array(reportData))) {
       console.log(type.name +  " test passed: report data");
       testsPassed++;
-      reportTests();
     }
     else {
       console.error(type.name +  " test failed: report data");
       testsFailed++;
-      reportTests();
     }
+
+    try {
+      // TODO: Can spid for testing be just nulls?
+      var quote = type.worker.constructor.getQuote(report, false, new ArrayBuffer(16));
+
+      var quoteData = type.worker.constructor.getQuoteData(quote);
+
+      if (_.isEqual(new Uint8Array(data), new Uint8Array(quoteData))) {
+        console.log(type.name +  " test passed: quote data");
+        testsPassed++;
+      }
+      else {
+        console.error(type.name +  " test failed: quote data");
+        testsFailed++;
+      }
+    }
+    catch (error) {
+      console.error(error);
+      console.error(type.name +  " test failed: quote data");
+      testsFailed++;
+    }
+
+    reportTests();
   });
 
   var initQuote = type.worker.constructor.initQuote();

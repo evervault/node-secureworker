@@ -27,9 +27,7 @@
     "int64-buffer": "^0.1.9",
     "nan": "^2.5.1",
     "browserify": "^14.1.0",
-    "yargs": "^7.0.1"
-  },
-  "devDependencies": {
+    "yargs": "^7.0.1",
     "underscore": "^1.8.3"
   },
   "engines": {

@@ -4,6 +4,7 @@
 #include <iostream> // %%%
 #include <sstream>
 #include <string.h>
+#include <openssl/rand.h>
 
 #include "sgx_tseal.h"
 #include "sgx_uae_service.h"
@@ -47,6 +48,12 @@ struct sgx_error {
   }
 };
 
+uint32_t arrayBufferLength(v8::Local<v8::Value> value) {
+  v8::Local<v8::Object> arrayBuffer = Nan::To<v8::Object>(value).ToLocalChecked();
+  v8::Local<v8::Value> length = Nan::Get(arrayBuffer, Nan::New("byteLength").ToLocalChecked()).ToLocalChecked();
+  return Nan::To<uint32_t>(length).FromJust();
+}
+
 // The rest of the stuff, which is per-instance
 
 class SecureWorkerInternal : public Nan::ObjectWrap {
@@ -64,6 +71,9 @@ public:
                      const uint8_t *data, size_t data_size);
 
   static void initQuote(sgx_target_info_t *target_info, sgx_epid_group_id_t *gid);
+  static void getQuoteSize(const uint8_t *sig_rl, uint32_t *quote_size);
+  static void getQuote(const sgx_report_t *report, sgx_quote_sign_type_t quote_type, const sgx_spid_t *spid,
+                       const uint8_t *sig_rl, uint32_t sig_rl_size, sgx_quote_t *quote, uint32_t quote_size);
 
   static Nan::Persistent<v8::Function> constructor;
   static NAN_METHOD(New);
@@ -71,6 +81,7 @@ public:
   static NAN_METHOD(Close);
   static NAN_METHOD(EmitMessage);
   static NAN_METHOD(InitQuote);
+  static NAN_METHOD(GetQuote);
   static NAN_METHOD(BootstrapMock);
 };
 
@@ -131,6 +142,33 @@ void SecureWorkerInternal::initQuote(sgx_target_info_t *target_info, sgx_epid_gr
     bzero(gid, sizeof(*gid));
     const sgx_status_t status = sgx_init_quote(target_info, gid);
     if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_init_quote");
+  }
+}
+
+void SecureWorkerInternal::getQuoteSize(const uint8_t *sig_rl, uint32_t *quote_size) {
+  {
+    const sgx_status_t status = sgx_get_quote_size(sig_rl, quote_size);
+    if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_get_quote_size");
+  }
+}
+
+void SecureWorkerInternal::getQuote(const sgx_report_t *report, sgx_quote_sign_type_t quote_type, const sgx_spid_t *spid,
+                                    const uint8_t *sig_rl, uint32_t sig_rl_size, sgx_quote_t *quote, uint32_t quote_size) {
+  {
+    sgx_quote_nonce_t nonce;
+    sgx_report_t qe_report;
+
+    int rc = RAND_bytes(nonce.rand, sizeof(nonce.rand));
+    if (rc != 1) throw sgx_error(SGX_ERROR_UNEXPECTED, "sgx_get_quote nonce generation");
+
+    bzero(&qe_report, sizeof(qe_report));
+    bzero(quote, quote_size);
+
+    const sgx_status_t status = sgx_get_quote(report, quote_type, spid, &nonce, sig_rl, sig_rl_size, &qe_report, quote, quote_size);
+    if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_get_quote");
+
+    // TODO: Verify that report data from qe_report is equal to sha256(nonce || quote).
+    //       See: https://github.com/01org/linux-sgx/issues/83
   }
 }
 
@@ -202,7 +240,7 @@ NAN_METHOD(SecureWorkerInternal::BootstrapMock) {
   if (info[0]->IsArrayBuffer()) {
     Nan::TypedArrayContents<uint8_t> arg0_uint8(info[0]);
     additional_data = *arg0_uint8;
-    additional_data_size = info[0].As<v8::Uint8Array>()->Length();
+    additional_data_size = arrayBufferLength(info[0]);
   } else {
     additional_data = nullptr;
     additional_data_size = 0;
@@ -213,7 +251,7 @@ NAN_METHOD(SecureWorkerInternal::BootstrapMock) {
   if (info[1]->IsArrayBuffer()) {
     Nan::TypedArrayContents<uint8_t> arg1_uint8(info[1]);
     data = *arg1_uint8;
-    data_size = info[1].As<v8::Uint8Array>()->Length();
+    data_size = arrayBufferLength(info[1]);
   } else {
     data = nullptr;
     data_size = 0;
@@ -270,6 +308,71 @@ NAN_METHOD(SecureWorkerInternal::InitQuote) {
   info.GetReturnValue().Set(result);
 }
 
+NAN_METHOD(SecureWorkerInternal::GetQuote) {
+  if (!info[0]->IsArrayBuffer()) {
+    return Nan::ThrowTypeError("Argument 0 error");
+  }
+  if (arrayBufferLength(info[0]) != sizeof(sgx_report_t)) {
+    return Nan::ThrowTypeError("Argument 0 error");
+  }
+
+  Nan::TypedArrayContents<uint8_t> arg0_uint8(info[0]);
+  sgx_report_t *report = reinterpret_cast<sgx_report_t *>(*arg0_uint8);
+
+  if (!info[1]->IsBoolean()) {
+    return Nan::ThrowTypeError("Argument 1 error");
+  }
+
+  sgx_quote_sign_type_t quote_type = SGX_UNLINKABLE_SIGNATURE;
+  if (Nan::To<bool>(info[1]).FromJust()) {
+    quote_type = SGX_LINKABLE_SIGNATURE;
+  }
+
+  if (!info[2]->IsArrayBuffer()) {
+    return Nan::ThrowTypeError("Argument 2 error");
+  }
+  if (arrayBufferLength(info[2]) != sizeof(sgx_spid_t)) {
+    return Nan::ThrowTypeError("Argument 2 error");
+  }
+
+  Nan::TypedArrayContents<uint8_t> arg2_uint8(info[2]);
+  sgx_spid_t *spid = reinterpret_cast<sgx_spid_t *>(*arg2_uint8);
+
+  uint32_t sig_rl_size;
+  const uint8_t *sig_rl;
+  if (info[3]->IsArrayBuffer()) {
+    Nan::TypedArrayContents<uint8_t> arg3_uint8(info[3]);
+    sig_rl = *arg0_uint8;
+    sig_rl_size = arrayBufferLength(info[3]);
+  } else {
+    sig_rl = nullptr;
+    sig_rl_size = 0;
+  }
+
+  uint32_t quote_size;
+
+  try {
+    SecureWorkerInternal::getQuoteSize(sig_rl, &quote_size);
+  } catch (sgx_error error) {
+    return error.rethrow();
+  }
+
+  v8::Local<v8::ArrayBuffer> quote_buffer = v8::ArrayBuffer::New(v8::Isolate::GetCurrent(), quote_size);
+  v8::Local<v8::Uint8Array> quote_array = v8::Uint8Array::New(quote_buffer, 0, quote_size);
+
+  Nan::TypedArrayContents<uint8_t> quote_uint8(quote_array);
+
+  sgx_quote_t *quote = reinterpret_cast<sgx_quote_t *>(*quote_uint8);
+
+  try {
+    SecureWorkerInternal::getQuote(report, quote_type, spid, sig_rl, sig_rl_size, quote, quote_size);
+  } catch (sgx_error error) {
+    return error.rethrow();
+  }
+
+  info.GetReturnValue().Set(quote_buffer);
+}
+
 static void secureworker_internal_init(v8::Local<v8::Object> exports, v8::Local<v8::Object> module) {
   v8::Local<v8::FunctionTemplate> function_template = Nan::New<v8::FunctionTemplate>(SecureWorkerInternal::New);
 
@@ -283,6 +386,7 @@ static void secureworker_internal_init(v8::Local<v8::Object> exports, v8::Local<
   Nan::SetPrototypeTemplate(function_template, "handlePostMessage", Nan::Null());
 
   Nan::SetMethod(function_template, "initQuote", SecureWorkerInternal::InitQuote);
+  Nan::SetMethod(function_template, "getQuote", SecureWorkerInternal::GetQuote);
 
   SecureWorkerInternal::constructor.Reset(Nan::GetFunction(function_template).ToLocalChecked());
 

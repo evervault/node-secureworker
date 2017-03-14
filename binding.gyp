@@ -17,6 +17,7 @@
 				"$(SGX_SDK)/include",
 				"duk_enclave",
 				"<!(node -e \"require('nan')\")",
+				"<(node_root_dir)/deps/openssl/openssl/include"
 			],
 			"link_settings": {
 				"libraries": [
