@@ -34,7 +34,7 @@ var timeout = setTimeout(function () {
   process.exit(1);
 }, 5 * 1000); // ms
 
-var report = function report() {
+var reportTests = function reportTests() {
   if (testsPassed === 2 * ALL_TESTS && testsFailed === 0) {
     console.log(`All ${testsPassed} tests passed.`);
     clearTimeout(timeout);
@@ -62,12 +62,12 @@ var realWorker = new RealSecureWorker('enclave.so', 'test.js');
     if (message.success === true) {
       console.log(type.name + " test passed: " + message.name);
       testsPassed++;
-      report();
+      reportTests();
     }
     else if (message.success === false) {
       console.error(type.name +  " test failed: " + message.name);
       testsFailed++;
-      report();
+      reportTests();
     }
   });
 
@@ -93,19 +93,19 @@ var realWorker = new RealSecureWorker('enclave.so', 'test.js');
       if (!new Buffer(message.timeSourceNonce, 'base64').equals(timeSourceNonce)) {
         console.error("Time nonce changed.");
         testsFailed++;
-        report();
+        reportTests();
         return;
       }
 
       if (bufferToTime(newTime) === bufferToTime(previousTime) + 1) {
         console.log(type.name +  " test passed: trusted time");
         testsPassed++;
-        report();
+        reportTests();
       }
       else {
         console.error(type.name +  " test failed: trusted time");
         testsFailed++;
-        report();
+        reportTests();
       }
     }
   });
@@ -118,17 +118,19 @@ var realWorker = new RealSecureWorker('enclave.so', 'test.js');
     if (message.command !== 'report') return;
     type.worker.removeOnMessage(listener);
 
-    var reportData = type.worker.constructor.getReportData(new Uint8Array(new Buffer(message.report, 'base64').values()).buffer);
+    var report = new Uint8Array(new Buffer(message.report, 'base64').values()).buffer;
+
+    var reportData = type.worker.constructor.getReportData(report);
 
     if (_.isEqual(new Uint8Array(data), new Uint8Array(reportData))) {
       console.log(type.name +  " test passed: report data");
       testsPassed++;
-      report();
+      reportTests();
     }
     else {
       console.error(type.name +  " test failed: report data");
       testsFailed++;
-      report();
+      reportTests();
     }
   });
 
