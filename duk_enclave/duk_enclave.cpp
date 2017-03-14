@@ -256,20 +256,23 @@ static duk_ret_t native_read_monotonic_counter(duk_context *ctx) {
 }
 
 static duk_ret_t native_get_report(duk_context *ctx) {
-  duk_require_type_mask(ctx, 0, DUK_TYPE_MASK_OBJECT);
+  duk_require_type_mask(ctx, 0, DUK_TYPE_MASK_NULL | DUK_TYPE_MASK_OBJECT);
   duk_require_type_mask(ctx, 1, DUK_TYPE_MASK_NULL | DUK_TYPE_MASK_OBJECT);
 
-	duk_size_t target_info_size;
-	void * const target_info_array = duk_get_buffer_data(ctx, 0, &target_info_size);
-
-  if (target_info_size != sizeof(sgx_target_info_t)) return DUK_RET_ERROR;
-
   void * report_data_array = NULL;
-  if (!duk_check_type(ctx, 1, DUK_TYPE_NULL)) {
+  if (!duk_check_type(ctx, 0, DUK_TYPE_NULL)) {
     duk_size_t report_data_size;
-    report_data_array = duk_get_buffer_data(ctx, 1, &report_data_size);
+    report_data_array = duk_get_buffer_data(ctx, 0, &report_data_size);
 
     if (report_data_size != sizeof(sgx_report_data_t)) return DUK_RET_ERROR;
+  }
+
+  void * target_info_array = NULL;
+  if (!duk_check_type(ctx, 1, DUK_TYPE_NULL)) {
+    duk_size_t target_info_size;
+    target_info_array = duk_get_buffer_data(ctx, 1, &target_info_size);
+
+    if (target_info_size != sizeof(sgx_target_info_t)) return DUK_RET_ERROR;
   }
 
 	void * const report = duk_push_fixed_buffer(ctx, sizeof(sgx_report_t));

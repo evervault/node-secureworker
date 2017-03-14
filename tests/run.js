@@ -136,8 +136,8 @@ var realWorker = new RealSecureWorker('enclave.so', 'test.js');
 
   type.worker.postMessage({
     command: 'report',
-    targetInfo: new Buffer(initQuote.targetInfo).toString('base64'),
-    reportData: data.toString('base64')
+    reportData: data.toString('base64'),
+    targetInfo: new Buffer(initQuote.targetInfo).toString('base64')
   });
 });
 

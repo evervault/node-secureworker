@@ -114,9 +114,10 @@
         return _dukEnclaveNative.getTime();
       },
 
-      // Returns the report as arraybuffer. targetInfo is 512 bytes. reportData is 64 bytes of extra information, arraybuffer.
-      getReport: function getReport(targetInfo, reportData) {
-        return _dukEnclaveNative.getReport(targetInfo, reportData);
+      // Returns the report as arraybuffer. reportData is 64 bytes of extra information, targetInfo is 512 bytes, arraybuffers. Both optional.
+      // TODO: Make it so that if targetInfo is not passed, result from initQuote is used called (instead of default useless report).
+      getReport: function getReport(reportData, targetInfo) {
+        return _dukEnclaveNative.getReport(reportData, targetInfo);
       }
     };
 
