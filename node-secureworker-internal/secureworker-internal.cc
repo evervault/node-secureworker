@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string.h>
 #include <openssl/rand.h>
+#include <openssl/sha.h>
 
 #include "sgx_tseal.h"
 #include "sgx_uae_service.h"
@@ -170,8 +171,19 @@ void SecureWorkerInternal::getQuote(const sgx_report_t *report, sgx_quote_sign_t
     const sgx_status_t status = sgx_get_quote(report, quote_type, spid, &nonce, sig_rl, sig_rl_size, &qe_report, quote, quote_size);
     if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_get_quote");
 
-    // TODO: Verify that report data from qe_report is equal to sha256(nonce || quote).
-    //       See: https://github.com/01org/linux-sgx/issues/83
+    SHA256_CTX context;
+    if(!SHA256_Init(&context)) throw sgx_error(SGX_ERROR_UNEXPECTED, "SHA256_Init");
+
+    if(!SHA256_Update(&context, &nonce, sizeof(nonce))) throw sgx_error(SGX_ERROR_UNEXPECTED, "SHA256_Update nonce");
+
+    if(!SHA256_Update(&context, quote, quote_size)) throw sgx_error(SGX_ERROR_UNEXPECTED, "SHA256_Update quote");
+
+    unsigned char digest[sizeof(sgx_report_data_t)] = {0};
+
+    if(!SHA256_Final(digest, &context)) throw sgx_error(SGX_ERROR_UNEXPECTED, "SHA256_Final");
+
+    // Report data from qe_report should be equal to sha256(nonce || quote).
+    if(memcmp(&qe_report.body.report_data, digest, sizeof(sgx_report_data_t)) != 0) throw sgx_error(SGX_ERROR_UNEXPECTED, "sgx_get_quote nonce mismatch");;
   }
 }
 
