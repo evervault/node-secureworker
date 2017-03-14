@@ -92,7 +92,7 @@ public:
 SecureWorkerInternal::SecureWorkerInternal(const char *file_name) : enclave_id(0) {
   {
     sgx_launch_token_t launch_token;
-    bzero(&launch_token, sizeof(launch_token));
+    memset(&launch_token, 0, sizeof(launch_token));
     int launch_token_updated = 0;
     const sgx_status_t status = sgx_create_enclave(file_name, SGX_DEBUG_FLAG, &launch_token, &launch_token_updated, &enclave_id, NULL);
     if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_create_enclave");
@@ -142,8 +142,8 @@ void SecureWorkerInternal::bootstrapMock(sgx_sealed_data_t *out, size_t out_size
 void SecureWorkerInternal::initQuote(sgx_target_info_t *target_info, sgx_epid_group_id_t *gid) {
   {
     // We have to zero out buffers first. See: https://github.com/01org/linux-sgx/issues/82
-    bzero(target_info, sizeof(*target_info));
-    bzero(gid, sizeof(*gid));
+    memset(target_info, 0, sizeof(*target_info));
+    memset(gid, 0, sizeof(*gid));
     const sgx_status_t status = sgx_init_quote(target_info, gid);
     if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_init_quote");
   }
@@ -165,8 +165,8 @@ void SecureWorkerInternal::getQuote(const sgx_report_t *report, sgx_quote_sign_t
     int rc = RAND_bytes(nonce.rand, sizeof(nonce.rand));
     if (rc != 1) throw sgx_error(SGX_ERROR_UNEXPECTED, "sgx_get_quote nonce generation");
 
-    bzero(&qe_report, sizeof(qe_report));
-    bzero(quote, quote_size);
+    memset(&qe_report, 0, sizeof(qe_report));
+    memset(quote, 0, quote_size);
 
     const sgx_status_t status = sgx_get_quote(report, quote_type, spid, &nonce, sig_rl, sig_rl_size, &qe_report, quote, quote_size);
     if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_get_quote");
