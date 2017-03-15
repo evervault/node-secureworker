@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+
+var child_process = require('child_process');
+var path = require('path');
+
+var argv = require('yargs')
+  .usage('Usage: $0 [options] <scripts...>\n\nIncludes specified JavaScript scripts into a signed enclave .so file.')
+
+  .help('help', false)
+  .alias('h', 'help')
+
+  .describe('output', "Output path for signed enclave object")
+  .string('output')
+  .default('output', 'enclave.so')
+  .demandOption('output')
+  .alias('o', 'output')
+
+  .describe('key', "Path to the key for enclave signing (will be created if missing)")
+  .default('key', 'key.pem')
+  .string('key')
+  .alias('k', 'key')
+
+  .describe('config', "Path to the config for enclave signing (will be created with defaults if missing)")
+  .default('config', 'enclave.config.xml')
+  .string('config')
+  .alias('c', 'config')
+
+  .demandCommand(1, "Scripts missing. At least one script to include in the enclave has to be specified.")
+
+  .argv;
+
+var base = path.normalize(path.join(path.dirname(require.resolve('../lib/index.js')), '..'));
+
+child_process.execFileSync('make', [
+  'enclave',
+  'SCRIPTS=' + argv._.map(function (script) {return path.resolve(script);}).join(' '),
+  'ENCLAVE_KEY=' + path.resolve(argv.key),
+  'ENCLAVE_CONFIG=' + path.resolve(argv.config),
+  'ENCLAVE_OUTPUT=' + path.resolve(argv.output)
+], {
+  cwd: base,
+  stdio: 'inherit',
+  encoding: 'utf8'
+});
