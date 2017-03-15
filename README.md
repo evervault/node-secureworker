@@ -62,30 +62,50 @@ const worker = new SecureWorker('enclave.so', 'enclave-bundle.js');
 
 ## Remote attestation 101
 
-Running code inside a secure environment nobody can inspect or tamper with is great, but not very helpful
-if you cannot prove to others that you have really executed the code inside such environment, or prove to
-others that they are really communicating with this environment, and not somebody who is pretending to be
-that secure environment.
+Running code inside a secure environment (enclave) nobody can inspect or tamper with is great, but not very helpful
+if you cannot prove to others that you have really executed the code inside a specific enclave, or prove to
+others that they are really communicating with the enclave, and not somebody who is pretending to be
+that enclave.
 
 To address this, Intel provides a service which can provide such proofs for you (now you have to trust
 Intel, but you are already trusting them with [correctness of their CPUs](https://www.wired.com/2016/06/demonically-clever-backdoor-hides-inside-computer-chip/)).
-The process, simplified, is as follows:
 
-1. every enclave has a *measurement* which corresponds to its binary image (code);
+The process to prove to others that something executed inside a specific *enclave*, simplified, can be as follows:
+
+1. every *enclave* has a *measurement* which corresponds to its binary image (code);
    in our case this consists of code provided by this package to run JavaScript inside an
-   enclave, and your scripts you built into the enclave
-2. when enclave wants to produce such proof, it generates a *report* which binds
-   a *measurement* with CPU identity and optional additional *report data*
-3. outside enclave, but on the same machine, a *report* is exchanged for a *quote* by a quoting enclave provided
+   *enclave*, and your scripts you built into the *enclave*
+2. when *enclave* wants to produce such proof, it generates a *report* which binds
+   a *measurement* with CPU identity and optional additional *report data* (often a *nonce* to
+   prevent proof we are generating to be reused)
+3. outside *enclave*, but on the same machine, a *report* is exchanged for a *quote* by a quoting *enclave* provided
    by Intel, and running on the machine as well
 4. a *quote* is send to Intel's remote attestation service and if everything looks like it is coming
    from the SGX platform and their CPUs, it produces an *attestation*
 5. one can verify offline this *attestation* using Intel's public key, furthermore, one should also
-   verify that the *measurement* corresponds to the expected code, and
-   potentially check *report data*
+   verify that the *measurement* corresponds to the expected code, and probably check *report data*
+   (especially if used as a *nonce*)
 
 Alternatively, steps 4. and 5. can be done directly, online, by an interested party who would
 contact Intel's remote attestation service with a *quote* and obtain *attestation*.
+
+On the other hand, sometimes one wants to know if they are communicating with a specific *enclave*. Often
+so that they can provide it a secret nobody else should receive. In this case a process could be:
+
+1. one should embed their public key in the *enclave*
+2. one starts establishing a secure ephemeral channel with the *enclave*
+3. *enclave* verifies the identity of a peer by using one's public key
+4. one verifies the identity of the *enclave* by asking it to generate
+   a *report* with a *nonce*
+5. *report* is exchanged for a *quote*
+6. one sends the *quote* Intel's remote attestation service to verify it, furthermore, one verifies the
+   *measurement* and *nonce*
+7. if everything matches, the secure channel can be trusted and one can be sure they communicate with
+   the *enclave* directly
+
+Intel SGX SDK provides a set of `sgx_ra_*` functions to help with the latter process, but this package
+does not (yet) expose them. You can use Web Crypto API to instead establish a secure channel,
+and have code around the enclave transmit messages between the peer and the enclave using `postMessage`.
 
 ## API (outside, untrusted)
 
