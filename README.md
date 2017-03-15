@@ -13,6 +13,12 @@ architecture.
 
 **Warning: The project is still in development. Feel free to contribute.**
 
+## Installation
+
+```
+npm install secureworker --save
+```
+
 ## Intel SGX requirements
 
 Of course, to really use this package properly, you need [SGX hardware](https://github.com/ayeks/SGX-hardware).
