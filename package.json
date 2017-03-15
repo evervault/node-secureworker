@@ -1,6 +1,6 @@
 {
   "name": "secureworker",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Run JavaScript inside an Intel SGX enclave",
   "main": "./lib/index.js",
   "repository": {
