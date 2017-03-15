@@ -35,6 +35,6 @@ SecureWorker.onMessage(function (message) {
 
   SecureWorker.postMessage({
     command: 'report',
-    report: toBase64(SecureWorker.getReport(message.reportData ? fromBase64(message.reportData) : null, message.targetInfo ? fromBase64(message.targetInfo) : null))
+    report: toBase64(SecureWorker.getReport(message.reportData ? fromBase64(message.reportData) : null))
   })
 });

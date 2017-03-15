@@ -412,6 +412,10 @@ void duk_enclave_post_message(const char *message) {
   handle_post_message.As<v8::Function>()->Call(thread_entry->entrant, 1, arguments);
 }
 
+sgx_status_t duk_enclave_init_quote(sgx_target_info_t *target_info, sgx_epid_group_id_t *gid) {
+  return sgx_init_quote(target_info, gid);
+};
+
 void duk_enclave_debug(const char *message) {
   std::cerr << message << std::endl;
 }

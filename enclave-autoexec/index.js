@@ -115,8 +115,12 @@
       },
 
       // Returns the report as arraybuffer. reportData is 64 bytes of extra information, targetInfo is 512 bytes, arraybuffers. Both optional.
-      // TODO: Make it so that if targetInfo is not passed, result from initQuote is used called (instead of default useless report).
       getReport: function getReport(reportData, targetInfo) {
+        // Only if it is undefined, we fetch target info ourselves. If it is null, we leave it null.
+        if (targetInfo === undefined) {
+          var initQuote = _dukEnclaveNative.initQuote();
+          targetInfo = initQuote.targetInfo;
+        }
         return _dukEnclaveNative.getReport(reportData, targetInfo);
       }
     };

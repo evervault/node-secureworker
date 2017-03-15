@@ -154,13 +154,10 @@ var realWorker = new RealSecureWorker('enclave.so', 'test.js');
     reportTests();
   });
 
-  var initQuote = type.worker.constructor.initQuote();
-
   type.worker.postMessage({
     command: 'report',
-    reportData: data.toString('base64'),
-    targetInfo: new Buffer(initQuote.targetInfo).toString('base64')
+    reportData: data.toString('base64')
   });
 });
 
-// TODO: Test quote, quote data, remote attestation, and validation of remote attestation.
+// TODO: Test remote attestation and validation of remote attestation.

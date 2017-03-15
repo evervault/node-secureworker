@@ -186,7 +186,7 @@ static duk_ret_t native_get_time(duk_context *ctx) {
     if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_get_trusted_time");
   }
   duk_push_object(ctx);
-  // [time plain buffer] [time_source_nonce plain buffer] [object]
+  // [current_time plain buffer] [time_source_nonce plain buffer] [object]
   duk_push_buffer_object(ctx, -3, 0, sizeof(sgx_time_t), DUK_BUFOBJ_ARRAYBUFFER);
   duk_put_prop_string(ctx, -2, "currentTime");
   duk_push_buffer_object(ctx, -2, 0, sizeof(sgx_time_source_nonce_t), DUK_BUFOBJ_ARRAYBUFFER);
@@ -252,6 +252,28 @@ static duk_ret_t native_read_monotonic_counter(duk_context *ctx) {
     if (status != SGX_SUCCESS) throw_sgx_status(ctx, status, "sgx_read_monotonic_counter");
   }
   duk_push_number(ctx, value);
+  return 1;
+}
+
+static duk_ret_t native_init_quote(duk_context *ctx) {
+  void * const target_info = duk_push_fixed_buffer(ctx, sizeof(sgx_target_info_t));
+  void * const gid = duk_push_fixed_buffer(ctx, sizeof(sgx_epid_group_id_t));
+  {
+    sgx_status_t internal_status;
+    const sgx_status_t status = duk_enclave_init_quote(
+      &internal_status,
+      reinterpret_cast<sgx_target_info_t *>(target_info),
+      reinterpret_cast<sgx_epid_group_id_t *>(gid)
+    );
+    if (status != SGX_SUCCESS) return DUK_RET_INTERNAL_ERROR;
+    if (internal_status != SGX_SUCCESS) return DUK_RET_ERROR;
+  }
+  duk_push_object(ctx);
+  // [target_info plain buffer] [gid plain buffer] [object]
+  duk_push_buffer_object(ctx, -3, 0, sizeof(sgx_target_info_t), DUK_BUFOBJ_ARRAYBUFFER);
+  duk_put_prop_string(ctx, -2, "targetInfo");
+  duk_push_buffer_object(ctx, -2, 0, sizeof(sgx_epid_group_id_t), DUK_BUFOBJ_ARRAYBUFFER);
+  duk_put_prop_string(ctx, -2, "gid");
   return 1;
 }
 
@@ -553,6 +575,7 @@ static const duk_function_list_entry native_methods[] = {
   {"destroyMonotonicCounter", native_destroy_monotonic_counter, 1},
   {"incrementMonotonicCounter", native_increment_monotonic_counter, 1},
   {"readMonotonicCounter", native_read_monotonic_counter, 1},
+  {"initQuote", native_init_quote, 0},
   {"getReport", native_get_report, 2},
   {"getRandomValues", native_get_random_values, 1},
   {"sha256Digest", native_sha256_digest, 1},

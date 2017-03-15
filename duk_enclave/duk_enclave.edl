@@ -28,6 +28,7 @@ enclave {
   untrusted {
     /* define OCALLs here. */
     void duk_enclave_post_message([in, string] const char *message);
+    sgx_status_t duk_enclave_init_quote([out] sgx_target_info_t *target_info, [out] sgx_epid_group_id_t *gid);
     void duk_enclave_debug([in, string] const char *message);
   };
 };
