@@ -261,7 +261,7 @@ SecureWorker._resolveContentKey = function _resolveContentKey(enclaveName, conte
 ## Examples
 
 To see example of package's use, check the [Luckychain project](https://github.com/luckychain/lucky),
-a proof of luck IPFS based blockchain:
+a proof of luck [IPFS](https://ipfs.io/) based blockchain:
 * [its enclave code](https://github.com/luckychain/lucky/blob/master/enclave/luckychain.js)
 * [its code using enclave](https://github.com/luckychain/lucky/blob/master/src/js/enclave.js)
 
