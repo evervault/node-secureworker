@@ -13,7 +13,7 @@
     "worker"
   ],
   "bin": {
-    "secureworker-create": "bin/build_enclave"
+    "secureworker-create": "bin/secureworker-create"
   },
   "scripts": {
     "build": "make node",

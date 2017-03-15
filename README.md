@@ -55,7 +55,7 @@ Once you have files you want to build into an enclave (e.g., `enclave-bundle.js`
 provided by this package to build an enclave file `enclave.so`:
 
 ```
-$ build_enclave --output enclave.so enclave-bundle.js tests.js
+$ secureworker-create --output enclave.so enclave-bundle.js tests.js
 ```
 
 Scripts are identified inside an enclave using their basename.

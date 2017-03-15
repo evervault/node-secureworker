@@ -8,7 +8,7 @@ var _ = require('underscore');
 
 process.chdir(__dirname);
 
-child_process.execFileSync('../bin/build_enclave', [
+child_process.execFileSync('../bin/secureworker-create', [
   'test.js',
   'test-commands.js'
 ], {
