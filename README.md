@@ -86,7 +86,7 @@ The process to prove to others that something executed inside a specific *enclav
    verify that the *measurement* corresponds to the expected code, and probably check *report data*
    (especially if used as a *nonce*)
 
-Alternatively, steps 4. and 5. can be done directly, online, by an interested party who would
+Alternatively, steps 4. and 5. can be done directly, online, by a peer who would
 contact Intel's remote attestation service with a *quote* and obtain *attestation*.
 
 On the other hand, sometimes one wants to know if they are communicating with a specific *enclave*. Often
