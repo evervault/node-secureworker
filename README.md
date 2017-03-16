@@ -284,6 +284,9 @@ SecureWorker._resolveContentKey = function _resolveContentKey(enclaveName, conte
 };
 ```
 
+If you want to force loading the package in the mock mode, set `FORCE_MOCK_SECUREWORKER`
+environment variable.
+
 ## Examples
 
 To see example of package's use, check the [Luckychain project](https://github.com/luckychain/lucky),
