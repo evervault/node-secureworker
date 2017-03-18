@@ -263,4 +263,6 @@ scripts-binary.as.changed
 enclave-autoexec/autoexec.js
 *.config.xml
 
+/build
+
 *.tgz
