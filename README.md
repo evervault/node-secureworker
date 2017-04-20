@@ -255,7 +255,7 @@ with target information needed for quoting.
 A cryptographic API. It matches
 [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API).
 
-### `crypto.random.getRandomValues(buffer:TypedArray) : TypedArray`
+### `crypto.getRandomValues(buffer:TypedArray) : TypedArray`
 
 A source of trusted randomness. It matches
 [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/RandomSource/getRandomValues).
