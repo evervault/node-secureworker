@@ -282,6 +282,8 @@ const SecureWorker = require('secureworker')
 SecureWorker._resolveContentKey = function _resolveContentKey(enclaveName, contentKey) {
   return fs.readFileSync(path.join(__dirname, contentKey), 'utf8');
 };
+
+const worker = new SecureWorker('enclave.so', 'enclave-bundle.js');
 ```
 
 If you want to force loading the package in the mock mode, set `FORCE_MOCK_SECUREWORKER`
