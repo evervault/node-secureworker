@@ -275,13 +275,15 @@ To use mock mode of operation, you have to provide a function which resolves
 script names to their content. For example:
 
 ```javascript
-import fs from 'fs';
-import path from 'path';
-import SecureWorker from 'secureworker';
+var fs = require('fs');
+var path = require('path');
+const SecureWorker = require('secureworker');
 
 SecureWorker._resolveContentKey = function _resolveContentKey(enclaveName, contentKey) {
   return fs.readFileSync(path.join(__dirname, contentKey), 'utf8');
 };
+
+const worker = new SecureWorker('enclave.so', 'enclave-bundle.js');
 ```
 
 If you want to force loading the package in the mock mode, set `FORCE_MOCK_SECUREWORKER`
@@ -295,4 +297,3 @@ a proof of luck [IPFS](https://ipfs.io/) based blockchain:
 * [its code using enclave](https://github.com/luckychain/lucky/blob/master/src/js/enclave.js)
 
 Simpler examples can be found in [tests](https://github.com/luckychain/node-secureworker/tree/master/tests) as well.
-
