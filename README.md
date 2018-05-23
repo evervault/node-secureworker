@@ -277,7 +277,7 @@ script names to their content. For example:
 ```javascript
 var fs = require('fs');
 var path = require('path');
-const SecureWorker = require('secureworker')
+const SecureWorker = require('secureworker');
 
 SecureWorker._resolveContentKey = function _resolveContentKey(enclaveName, contentKey) {
   return fs.readFileSync(path.join(__dirname, contentKey), 'utf8');
