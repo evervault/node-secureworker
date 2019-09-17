@@ -2,14 +2,16 @@
 
 This NPM package allows you to run JavaScript inside a secure (trusted) environment (enclave) provided by
 [Intel SGX](https://software.intel.com/en-us/sgx) technology on modern CPUs. When used properly,
-even operating system or a cloud provider cannot access data, and observe and interfere with
+even the operating system or a cloud provider cannot access data or observe/interfere with
 operations inside an enclave.
 
 This package executes JavaScript using the [Duktape](http://duktape.org/) JavaScript engine and provides
-a web workers-like familiar environment. Cryptographic operations are exposed through a Web Crypto compatible API.
-Promises are available as well. This allows you to write isometric code and use the same code on client, server,
-and inside enclaves, and see secure workers as just another, secure and trusted, component in your JavaScript-based
+a Web Workers-style interface. Cryptographic operations are exposed through a Web Crypto compatible API.
+Promises are also available. This allows you to write isometric code and use the same code on the client, server,
+and inside enclaves. Workers can be seen as just another secure and trusted component in your JavaScript-based
 architecture.
+
+This package is maintained by [evervault](https://evervault.com/).
 
 **Warning: The project is still in development. Feel free to contribute.**
 
@@ -21,20 +23,18 @@ npm install secureworker --save
 
 ## Intel SGX requirements
 
-Of course, to really use this package properly, you need [SGX hardware](https://github.com/ayeks/SGX-hardware).
+To use this package in production, you need [SGX hardware](https://github.com/ayeks/SGX-hardware) as well as a [commercial license from Intel](https://software.intel.com/en-us/sgx/request-license).
 
-But for development you have various options. Intel provides through its SDK an SGX simulator.
-This package also fallbacks to mock mode of operation, where it uses [vm](https://nodejs.org/api/vm.html)
-to simulate an isolated running environment, if it cannot load necessary binaries.
-Of course, such execution does not give you added security, but it is good for experimentation.
+For development you have various options. Intel provides an SGX simulator in the SGX SDK.
+This package also falls back to the "mock" mode of operation, where it uses [vm](https://nodejs.org/api/vm.html)
+to simulate an isolated running environment if it cannot load necessary binaries.
+*Such execution does not give you added security, but it is good for experimentation.*
 
 If you would like to build enclaves, you need [Intel SGX SDK](https://software.intel.com/en-us/sgx-sdk/download).
 To run them, you need [SGX PSW](https://github.com/01org/linux-sgx) (platform software, i.e., runtime).
 To run them with SGX hardware, you need a [kernel driver](https://github.com/01org/linux-sgx-driver).
 
-Alternativelly, you can use this [Docker image](https://hub.docker.com/r/tozd/sgx/) which has all SDK and PSW
-already installed. (If you install SGX kernel driver on the host, you can even use it in production to run
-your SGX enabled apps.)
+We are working a new Docker image which will allow you automatically configure your SGX environment with minimal configuration.
 
 **Warning: By default built enclaves are run in simulation and debug mode (or even mock mode). This does not provide any added security.**
 
@@ -51,8 +51,7 @@ file, bundling any imports into the bundle as well. The command below requires a
 $ browserify --insert-global-vars __filename,__dirname --no-commondir -t [ babelify --presets [ es2015 ] ] enclave-source.js > enclave-bundle.js
 ```
 
-Once you have files you want to build into an enclave (e.g., `enclave-bundle.js`, `tests.js`), you can use a tool
-provided by this package to build an enclave file `enclave.so`:
+Once you have files you want to build into an enclave (e.g., `enclave-bundle.js`, `tests.js`), you can use the `secureworker-create` binary in this package to build an enclave file `enclave.so`:
 
 ```
 $ secureworker-create --output enclave.so enclave-bundle.js tests.js
@@ -70,30 +69,30 @@ const worker = new SecureWorker('enclave.so', 'enclave-bundle.js');
 
 Running code inside a secure environment (enclave) nobody can inspect or tamper with is great, but not very helpful
 if you cannot prove to others that you have really executed the code inside a specific enclave, or prove to
-others that they are really communicating with the enclave, and not somebody who is pretending to be
+others that they are really communicating with the enclave as opposed to somebody who is pretending to be
 that enclave.
 
-To address this, Intel provides a service which can provide such proofs for you (now you have to trust
+To address this, Intel provides a service which can provide such proofs for you (you have to trust
 Intel, but you are already trusting them with [correctness of their CPUs](https://www.wired.com/2016/06/demonically-clever-backdoor-hides-inside-computer-chip/)).
 
-The process to prove to others that something executed inside a specific *enclave*, simplified, can be as follows:
+The process to prove to others that something executed inside a specific *enclave*, simplified, is as follows:
 
 1. every *enclave* has a *measurement* which corresponds to its binary image (code);
    in our case this consists of code provided by this package to run JavaScript inside an
    *enclave*, and your scripts you built into the *enclave*
-2. when *enclave* wants to produce such proof, it generates a *report* which binds
+2. when the *enclave* wants to produce such proof, it generates a *report* which binds
    a *measurement* with CPU identity and optional additional *report data* (often a *nonce* to
    prevent proof we are generating to be reused)
 3. outside *enclave*, but on the same machine, a *report* is exchanged for a *quote* by a quoting *enclave* provided
    by Intel, and running on the machine as well
-4. a *quote* is send to Intel's remote attestation service and if everything looks like it is coming
-   from the SGX platform and their CPUs, it produces an *attestation*
-5. one can verify offline this *attestation* using Intel's public key, furthermore, one should also
+4. a *quote* is sent to Intel's Remote Attestation service and if everything is coming
+   from a valid SGX enclave on an SGX-enabled platform and CPU, it produces an *attestation*
+5. one can verify offline this *attestation* using Intel's public key. One should also
    verify that the *measurement* corresponds to the expected code, and probably check *report data*
    (especially if used as a *nonce*)
 
-Alternatively, steps 4. and 5. can be done directly, online, by a peer who would
-contact Intel's remote attestation service with a *quote* and obtain *attestation*.
+Alternatively, steps _4_ and _5_ can be done directly, online, by a peer who would
+contact Intel's Remote Attestation service with a *quote* and obtain an *attestation*.
 
 On the other hand, sometimes one wants to know if they are communicating with a specific *enclave*. Often
 so that they can provide it a secret nobody else should receive. In this case a process could be:
@@ -110,7 +109,7 @@ so that they can provide it a secret nobody else should receive. In this case a 
    the *enclave* directly
 
 Intel SGX SDK provides a set of `sgx_ra_*` functions to help with the latter process, but this package
-does not (yet) expose them. You can use Web Crypto API to instead establish a secure channel,
+does not (yet) expose them. You can use the Web Crypto API to instead establish a secure channel,
 and have code around the enclave transmit messages between the peer and the enclave using `postMessage`.
 
 ## API (outside, untrusted)
@@ -289,11 +288,14 @@ const worker = new SecureWorker('enclave.so', 'enclave-bundle.js');
 If you want to force loading the package in the mock mode, set `FORCE_MOCK_SECUREWORKER`
 environment variable.
 
+## Credits
+node-secureworker was originally developed as part of the Luckychain project by Mitar Milutinovic and Warren He. You can find their original paper _"Proof of Luck: an Efficient Blockchain Consensus Protocol"_ on [arXiv](https://arxiv.org/abs/1703.05435).
+
 ## Examples
 
-To see example of package's use, check the [Luckychain project](https://github.com/luckychain/lucky),
-a proof of luck [IPFS](https://ipfs.io/) based blockchain:
+To see usage examples, check out [Luckychain](https://github.com/luckychain/lucky),
+a _"proof of luck"_ [IPFS](https://ipfs.io/)-based blockchain:
 * [its enclave code](https://github.com/luckychain/lucky/blob/master/enclave/luckychain.js)
 * [its code using enclave](https://github.com/luckychain/lucky/blob/master/src/js/enclave.js)
 
-Simpler examples can be found in [tests](https://github.com/luckychain/node-secureworker/tree/master/tests) as well.
+Simpler examples can be found in [tests](https://github.com/evervault/node-secureworker/tree/master/tests) as well.
