@@ -295,7 +295,7 @@ node-secureworker was originally developed as part of the Luckychain project by 
 
 To see usage examples, check out [Luckychain](https://github.com/luckychain/lucky),
 a _"proof of luck"_ [IPFS](https://ipfs.io/)-based blockchain:
-* [its enclave code](https://github.com/luckychain/lucky/blob/master/enclave/luckychain.js)
-* [its code using enclave](https://github.com/luckychain/lucky/blob/master/src/js/enclave.js)
+* [the in-enclave source code](https://github.com/luckychain/lucky/blob/master/enclave/luckychain.js)
+* [the Node.js host application](https://github.com/luckychain/lucky/blob/master/src/js/enclave.js)
 
 Simpler examples can be found in [tests](https://github.com/evervault/node-secureworker/tree/master/tests) as well.
