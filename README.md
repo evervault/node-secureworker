@@ -289,7 +289,8 @@ If you want to force loading the package in the mock mode, set `FORCE_MOCK_SECUR
 environment variable.
 
 ## Credits
-node-secureworker was originally developed as part of the Luckychain project by Mitar Milutinovic and Warren He. You can find their original paper _"Proof of Luck: an Efficient Blockchain Consensus Protocol"_ on [arXiv](https://arxiv.org/abs/1703.05435).
+
+SecureWorker was originally developed as part of the [Luckychain project](https://github.com/luckychain/lucky) by Mitar Milutinovic and Warren He. See their whitepaper [Proof of Luck: an Efficient Blockchain Consensus Protocol](https://github.com/luckychain/lucky#whitepaper).
 
 ## Examples
 
