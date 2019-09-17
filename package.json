@@ -1,16 +1,17 @@
 {
   "name": "secureworker",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Run JavaScript inside an Intel SGX enclave",
   "main": "./lib/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/luckychain/node-secureworker.git"
+    "url": "git+https://github.com/evervault/node-secureworker.git"
   },
   "keywords": [
     "sgx",
     "enclave",
-    "worker"
+    "worker",
+    "evervault"
   ],
   "bin": {
     "secureworker-create": "bin/secureworker-create"
@@ -35,7 +36,7 @@
   },
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/luckychain/node-secureworker/issues"
+    "url": "https://github.com/evervault/node-secureworker/issues"
   },
-  "homepage": "https://github.com/luckychain/node-secureworker"
+  "homepage": "https://github.com/evervault/node-secureworker"
 }
