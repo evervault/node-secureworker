@@ -89,7 +89,7 @@
       },
 
       monotonicCounters: {
-        // Returns an object {uuid:arraybuffer, value:number}.
+        // Returns an object {uuid:ArrayBuffer, value:Number}.
         create: function create() {
           return _dukEnclaveNative.createMonotonicCounter();
         },
@@ -109,19 +109,32 @@
         }
       },
 
-      // Returns an object {currentTime:arraybuffer, timeSourceNonce:arraybuffer}.
+      // Returns an object {currentTime:ArrayBuffer, timeSourceNonce:ArrayBuffer}.
       getTrustedTime: function getTrustedTime() {
         return _dukEnclaveNative.getTime();
       },
 
-      // Returns the report as arraybuffer. reportData is 64 bytes of extra information, targetInfo is 512 bytes, arraybuffers. Both optional.
+      // Returns the report as ArrayBuffer. reportData is 64 bytes of extra information, targetInfo is 512 bytes, ArrayBuffers. Both optional.
       getReport: function getReport(reportData, targetInfo) {
         // Only if it is undefined, we fetch target info ourselves. If it is null, we leave it null.
         if (targetInfo === undefined) {
           var initQuote = _dukEnclaveNative.initQuote();
           targetInfo = initQuote.targetInfo;
         }
+        
         return _dukEnclaveNative.getReport(reportData, targetInfo);
+      },
+
+      // Seals an ArrayBuffer along with an additional buffer of *unencrypted* text
+      sealData: function sealData(additionalData, data) {
+        if (!additionalData || additionalData.length === 0) additionalData = null;
+
+        return _dukEnclaveNative.sealData(additionalData, data);
+      },
+
+      // Returns an object from a sealed ArrayBuffer {data: ArrayBuffer, additionalData: ArrayBuffer}
+      unsealData: function unsealData(data) {
+        return _dukEnclaveNative.unsealData(data);
       }
     };
 

@@ -109,3 +109,5 @@ SecureWorker.ready.then(function () {
 SecureWorker.ready.then(function () {
   SecureWorker.importScripts('test-commands.js');
 }).then(passed("import scripts")).catch(report("import scripts"));
+
+// TODO: write tests for sealData and unsealData

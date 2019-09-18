@@ -5,8 +5,6 @@
 ![Open GitHub Issues](https://img.shields.io/github/issues/evervault/node-secureworker "Open GitHub Issues")
 ![Package License](https://img.shields.io/github/license/evervault/node-secureworker "Package License")
 
-
-
 This NPM package allows you to run JavaScript inside a secure (trusted) environment (enclave) provided by
 [Intel SGX](https://software.intel.com/en-us/sgx) technology on modern CPUs. When used properly,
 even the operating system or a cloud provider cannot access data or observe/interfere with
@@ -255,6 +253,18 @@ Returns a report for the calling enclave. Report can optionally include 64 bytes
 
 If `targetInfo` is not provided (is `undefined`) it will be automatically populated
 with target information needed for quoting.
+
+### `SecureWorker.sealData([additionalData:ArrayBuffer], [data:ArrayBuffer]) : ArrayBuffer`
+
+Seals an ArrayBuffer using a key derived from the enclave EGETKEY instruction.
+
+Can optionally include an `additionalData` ArrayBuffer which _will not be encrypted_ but will be part of the GCM MAC calculation, which also covers the data to be encrypted.
+
+This function can be used to encrypt and persistently store data outside of the enclave and is bound to the particular enclave running on the same platform.
+
+### `SecureWorker.unsealData([data:ArrayBuffer]) : ArrayBuffer`
+
+Decrypts a sealed/encrypted ArrayBuffer and returns the original decrypted information as an ArrayBuffer.
 
 ### `crypto.subtle.*`
 
