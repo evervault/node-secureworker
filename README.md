@@ -48,9 +48,9 @@ We are working a new Docker image which will allow you automatically configure y
 ## Bundling and building
 
 Each enclave you build with this package (`.so` file) can contain multiple JavaScript files.
-You can bundle each of them with your favorite tool. For example, for [browserify](http://browserify.org/)
-the following options work well to create a `enclave-bundle.js` file from input `enclave-source.js`
-file, bundling any imports into the bundle as well. The command below requires also [babelify](https://www.npmjs.com/package/babelify), [babel-core](https://www.npmjs.com/package/babel-core) and [babel-preset-es2015](https://www.npmjs.com/package/babel-preset-es2015) npm packages.
+You can bundle each of them with your favorite tool. For example, with [browserify](http://browserify.org/)
+the following options work well to create an `enclave-bundle.js` file from an input `enclave-source.js`
+file, bundling any imports as well. The command below also requires [babelify](https://www.npmjs.com/package/babelify), [babel-core](https://www.npmjs.com/package/babel-core) and [babel-preset-es2015](https://www.npmjs.com/package/babel-preset-es2015), which can be installed from npm.
 
 ```
 $ browserify --insert-global-vars __filename,__dirname --no-commondir -t [ babelify --presets [ es2015 ] ] enclave-source.js > enclave-bundle.js
