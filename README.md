@@ -1,5 +1,12 @@
 # SecureWorker
 
+![npm Version](https://img.shields.io/npm/v/secureworker "npm Version")
+![Required Node.js Version](https://img.shields.io/node/v/secureworker "Required Node.js Version")
+![Open GitHub Issues](https://img.shields.io/github/issues/evervault/node-secureworker "Open GitHub Issues")
+![Package License](https://img.shields.io/github/license/evervault/node-secureworker "Package License")
+
+
+
 This NPM package allows you to run JavaScript inside a secure (trusted) environment (enclave) provided by
 [Intel SGX](https://software.intel.com/en-us/sgx) technology on modern CPUs. When used properly,
 even the operating system or a cloud provider cannot access data or observe/interfere with
