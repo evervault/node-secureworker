@@ -1,4 +1,4 @@
-# SecureWorker
+![SecureWorker](https://raw.githubusercontent.com/evervault/node-secureworker/master/secureworker-logo.png)
 
 ![npm Version](https://img.shields.io/npm/v/secureworker "npm Version")
 ![Required Node.js Version](https://img.shields.io/node/v/secureworker "Required Node.js Version")
