@@ -26,7 +26,7 @@ This package is maintained by [evervault](https://evervault.com/).
 npm install secureworker --save
 ```
 
-## Intel SGX requirements
+## Intel SGX Requirements
 
 To use this package in production, you need [SGX hardware](https://github.com/ayeks/SGX-hardware) as well as a [commercial license from Intel](https://software.intel.com/en-us/sgx/request-license).
 
@@ -45,7 +45,7 @@ We are working a new Docker image which will allow you automatically configure y
 
 [Read more about various types of compiling and executing enclaves](https://software.intel.com/en-us/blogs/2016/01/07/intel-sgx-debug-production-prelease-whats-the-difference).
 
-## Bundling and building
+## Bundling and Building
 
 Each enclave you build with this package (`.so` file) can contain multiple JavaScript files.
 You can bundle each of them with your favorite tool. For example, with [browserify](http://browserify.org/)
@@ -283,7 +283,7 @@ A source of trusted randomness. It matches
 
 ### `nextTick:Function` and `setImmediate:Function`
 
-Enclaves do not have IO, so those behave the same.
+Enclaves do not have IO, so these behave the same.
 
 ## Mock API
 
@@ -307,4 +307,4 @@ environment variable.
 
 ## Credits
 
-SecureWorker was originally developed as part of the [Luckychain project](https://github.com/luckychain/lucky) by Mitar Milutinovic and Warren He. See their whitepaper [Proof of Luck: an Efficient Blockchain Consensus Protocol](https://github.com/luckychain/lucky#whitepaper).
+SecureWorker was originally developed as part of [Luckychain](https://github.com/luckychain/lucky) by Mitar Milutinovic and Warren He from UC Berkeley. See their whitepaper [Proof of Luck: an Efficient Blockchain Consensus Protocol](https://github.com/luckychain/lucky#whitepaper).
