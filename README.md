@@ -70,7 +70,7 @@ Now, you can start your secure worker (enclave) using:
 const worker = new SecureWorker('enclave.so', 'enclave-bundle.js');
 ```
 
-## Remote attestation 101
+## Remote Attestation 101
 
 Running code inside a secure environment (enclave) nobody can inspect or tamper with is great, but not very helpful
 if you cannot prove to others that you have really executed the code inside a specific enclave, or prove to
@@ -308,12 +308,3 @@ environment variable.
 ## Credits
 
 SecureWorker was originally developed as part of the [Luckychain project](https://github.com/luckychain/lucky) by Mitar Milutinovic and Warren He. See their whitepaper [Proof of Luck: an Efficient Blockchain Consensus Protocol](https://github.com/luckychain/lucky#whitepaper).
-
-## Examples
-
-To see usage examples, check out [Luckychain](https://github.com/luckychain/lucky),
-a _"proof of luck"_ [IPFS](https://ipfs.io/)-based blockchain:
-* [the in-enclave source code](https://github.com/luckychain/lucky/blob/master/enclave/luckychain.js)
-* [the Node.js host application](https://github.com/luckychain/lucky/blob/master/src/js/enclave.js)
-
-Simpler examples can be found in [tests](https://github.com/evervault/node-secureworker/tree/master/tests) as well.
