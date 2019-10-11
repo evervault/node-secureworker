@@ -147,16 +147,13 @@ Returns data provided when generating a report, which is carried over to `quote`
 
 ### `SecureWorker.getRemoteAttestation(quote:ArrayBuffer, payloadObj:Object, raUrl:String, callbackFn:Function) : ArrayBuffer`
 
-Returns a signed attestation for provided `quote`, if remote attestation succeeds.
+Returns a signed attestation for provided `quote` if Remote Attestation succeeds.
 
-`payLoadObj` must contain the Subscription Key for the Remote Attestation Server with the key `subscriptionKey`. The `payloadObj` may also contain a `pseManifest` and a `nonce` (see Intel Attestation Service spec [here.](https://api.trustedservices.intel.com/documents/sgx-attestation-api-spec.pdf)) 
+`payLoadObj` must contain the Subscription Key for the Remote Attestation Server with the key `subscriptionKey`. The `payloadObj` may also contain a `pseManifest` and a `nonce` (see [Intel Attestation Service Spec](https://api.trustedservices.intel.com/documents/sgx-attestation-api-spec.pdf)) 
 
-`raUrl` is the url of the remote attestation server. If left empty, it will be defaulted to the Intel Remote Attestation Service.
+`raUrl` is the URL of the Remote Attestation server. If left empty, it will be defaulted to the Intel Remote Attestation Service.
 
-`callbackFn` is a callback function with the signature `function callbackFn(attestationSignature:ArrayBuffer [,errorMsg:String])`.
-
-If the attestation succeeds, the RA signature will be passed as an ArrayBuffer to the first parameter. Should the attestation fail, an error message will be passed as a String to the second parameter and the first parameter will be `undefined`.
-
+`callbackFn` is a callback function with the signature `function callbackFn(attestationSignature:ArrayBuffer, [errorMsg:String])`.
 
 ### `SecureWorker.validateRemoteAttestation(quote:ArrayBuffer, attestation:ArrayBuffer) : Boolean`
 
