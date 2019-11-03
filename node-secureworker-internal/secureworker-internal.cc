@@ -409,7 +409,7 @@ void duk_enclave_post_message(const char *message) {
   v8::Local<v8::Value> handle_post_message = Nan::Get(thread_entry->entrant, Nan::New("handlePostMessage").ToLocalChecked()).ToLocalChecked();
   if (!handle_post_message->IsFunction()) return;
   v8::Local<v8::Value> arguments[] = {Nan::New<v8::String>(message).ToLocalChecked()};
-  handle_post_message.As<v8::Function>()->Call(v8::Isolate::GetCurrent()->GetCurrentContext(), thread_entry->entrant, 1, arguments);
+  handle_post_message.As<v8::Function>()->Call(v8::Isolate::GetCurrent()->GetCurrentContext(), thread_entry->entrant, 1, arguments).FromMaybe(v8::Local<v8::Value>());
 }
 
 sgx_status_t duk_enclave_init_quote(sgx_target_info_t *target_info, sgx_epid_group_id_t *gid) {
