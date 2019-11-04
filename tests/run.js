@@ -78,8 +78,8 @@ var realWorker = new RealSecureWorker('enclave.so', 'test.js');
     if (message.command !== 'time') return;
 
     if (!previousTime && !timeSourceNonce) {
-      previousTime = new Buffer(message.currentTime, 'base64');
-      timeSourceNonce = new Buffer(message.timeSourceNonce, 'base64');
+      previousTime = Buffer.from(message.currentTime, 'base64');
+      timeSourceNonce = Buffer.from(message.timeSourceNonce, 'base64');
 
       setTimeout(function () {
          type.worker.postMessage({command: 'time'});
@@ -88,9 +88,9 @@ var realWorker = new RealSecureWorker('enclave.so', 'test.js');
     else {
       type.worker.removeOnMessage(listener);
 
-      var newTime = new Buffer(message.currentTime, 'base64');
+      var newTime = Buffer.from(message.currentTime, 'base64');
 
-      if (!new Buffer(message.timeSourceNonce, 'base64').equals(timeSourceNonce)) {
+      if (!Buffer.from(message.timeSourceNonce, 'base64').equals(timeSourceNonce)) {
         console.error("Time nonce changed.");
         testsFailed++;
         reportTests();
@@ -118,7 +118,7 @@ var realWorker = new RealSecureWorker('enclave.so', 'test.js');
     if (message.command !== 'report') return;
     type.worker.removeOnMessage(listener);
 
-    var report = new Uint8Array(new Buffer(message.report, 'base64').values()).buffer;
+    var report = new Uint8Array(Buffer.from(message.report, 'base64').values()).buffer;
 
     var reportData = type.worker.constructor.getReportData(report);
 
