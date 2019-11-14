@@ -5,7 +5,7 @@ function toBase64(data) {
     return Duktape.enc('base64', new Buffer(data));
   }
   else {
-    return Buffer(data).toString('base64');
+    return Buffer.from(data).toString('base64');
   }
 }
 
@@ -14,7 +14,7 @@ function fromBase64(string) {
     return new Uint8Array(Duktape.dec('base64', string)).buffer;
   }
   else {
-    return new Uint8Array(new Buffer(string, 'base64').values()).buffer;
+    return new Uint8Array(Buffer.from(string, 'base64').values()).buffer;
   }
 }
 

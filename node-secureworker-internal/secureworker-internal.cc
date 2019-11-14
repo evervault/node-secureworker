@@ -61,6 +61,8 @@ void arrayBufferData(v8::Local<v8::Value> input, uint8_t **data, size_t *size) {
 // The rest of the stuff, which is per-instance
 
 class SecureWorkerInternal : public Nan::ObjectWrap {
+private:
+  bool destroyed;
 public:
   sgx_enclave_id_t enclave_id;
 
@@ -68,6 +70,7 @@ public:
   ~SecureWorkerInternal();
 
   void init(const char *key);
+  void destroy();
   void close();
   void emitMessage(const char *message);
   void bootstrapMock(sgx_sealed_data_t *out, size_t out_size,
@@ -75,7 +78,7 @@ public:
                      const uint8_t *data, size_t data_size);
 
   static void initQuote(sgx_target_info_t *target_info, sgx_epid_group_id_t *gid);
-  static void getQuoteSize(const uint8_t *sig_rl, uint32_t *quote_size);
+  static void getQuoteSize(const uint8_t *sig_rl, uint32_t sig_rl_size, uint32_t *quote_size);
   static void getQuote(const sgx_report_t *report, sgx_quote_sign_type_t quote_type, const sgx_spid_t *spid,
                        const uint8_t *sig_rl, uint32_t sig_rl_size, sgx_quote_t *quote, uint32_t quote_size);
 
@@ -87,9 +90,10 @@ public:
   static NAN_METHOD(InitQuote);
   static NAN_METHOD(GetQuote);
   static NAN_METHOD(BootstrapMock);
+  static NAN_METHOD(Destroy);
 };
 
-SecureWorkerInternal::SecureWorkerInternal(const char *file_name) : enclave_id(0) {
+SecureWorkerInternal::SecureWorkerInternal(const char *file_name) : destroyed(false), enclave_id(0) {
   {
     sgx_launch_token_t launch_token;
     memset(&launch_token, 0, sizeof(launch_token));
@@ -102,10 +106,19 @@ SecureWorkerInternal::SecureWorkerInternal(const char *file_name) : enclave_id(0
 
 SecureWorkerInternal::~SecureWorkerInternal() {
   {
-    const sgx_status_t status = sgx_destroy_enclave(enclave_id);
-    if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_destroy_enclave");
+    if (!destroyed)
+    {
+      sgx_destroy_enclave(enclave_id);  
+    }
   }
   std::cerr << "destroyed enclave " << enclave_id << std::endl; // %%%
+  enclave_id = 0;
+}
+
+void SecureWorkerInternal::destroy() {
+  destroyed = true;
+  const sgx_status_t status = sgx_destroy_enclave(enclave_id);
+  if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_destroy_enclave");
   enclave_id = 0;
 }
 
@@ -149,9 +162,9 @@ void SecureWorkerInternal::initQuote(sgx_target_info_t *target_info, sgx_epid_gr
   }
 }
 
-void SecureWorkerInternal::getQuoteSize(const uint8_t *sig_rl, uint32_t *quote_size) {
+void SecureWorkerInternal::getQuoteSize(const uint8_t *sig_rl, uint32_t sig_rl_size, uint32_t *quote_size) {
   {
-    const sgx_status_t status = sgx_get_quote_size(sig_rl, quote_size);
+    const sgx_status_t status = sgx_calc_quote_size(sig_rl, sig_rl_size, quote_size);
     if (status != SGX_SUCCESS) throw sgx_error(status, "sgx_get_quote_size");
   }
 }
@@ -289,6 +302,16 @@ NAN_METHOD(SecureWorkerInternal::BootstrapMock) {
   info.GetReturnValue().Set(out_buffer);
 }
 
+NAN_METHOD(SecureWorkerInternal::Destroy) {
+  SecureWorkerInternal *secure_worker_internal = Nan::ObjectWrap::Unwrap<SecureWorkerInternal>(info.This());
+  try {
+    entry_info entry(info.This());
+    secure_worker_internal->destroy();
+  } catch (sgx_error error) {
+    return error.rethrow();
+  }
+}
+
 NAN_METHOD(SecureWorkerInternal::InitQuote) {
   sgx_target_info_t target_info;
   sgx_epid_group_id_t gid;
@@ -363,7 +386,7 @@ NAN_METHOD(SecureWorkerInternal::GetQuote) {
   uint32_t quote_size;
 
   try {
-    SecureWorkerInternal::getQuoteSize(sig_rl, &quote_size);
+    SecureWorkerInternal::getQuoteSize(sig_rl, sig_rl_size, &quote_size);
   } catch (sgx_error error) {
     return error.rethrow();
   }
@@ -394,10 +417,13 @@ static void secureworker_internal_init(v8::Local<v8::Object> exports, v8::Local<
   Nan::SetPrototypeMethod(function_template, "close", SecureWorkerInternal::Close);
   Nan::SetPrototypeMethod(function_template, "emitMessage", SecureWorkerInternal::EmitMessage);
   Nan::SetPrototypeMethod(function_template, "bootstrapMock", SecureWorkerInternal::BootstrapMock);
+  Nan::SetPrototypeMethod(function_template, "destroy", SecureWorkerInternal::Destroy);
+
   Nan::SetPrototypeTemplate(function_template, "handlePostMessage", Nan::Null());
 
   Nan::SetMethod(function_template, "initQuote", SecureWorkerInternal::InitQuote);
   Nan::SetMethod(function_template, "getQuote", SecureWorkerInternal::GetQuote);
+
 
   SecureWorkerInternal::constructor.Reset(Nan::GetFunction(function_template).ToLocalChecked());
 
@@ -409,7 +435,7 @@ void duk_enclave_post_message(const char *message) {
   v8::Local<v8::Value> handle_post_message = Nan::Get(thread_entry->entrant, Nan::New("handlePostMessage").ToLocalChecked()).ToLocalChecked();
   if (!handle_post_message->IsFunction()) return;
   v8::Local<v8::Value> arguments[] = {Nan::New<v8::String>(message).ToLocalChecked()};
-  handle_post_message.As<v8::Function>()->Call(thread_entry->entrant, 1, arguments);
+  handle_post_message.As<v8::Function>()->Call(v8::Isolate::GetCurrent()->GetCurrentContext(), thread_entry->entrant, 1, arguments).FromMaybe(v8::Local<v8::Value>());
 }
 
 sgx_status_t duk_enclave_init_quote(sgx_target_info_t *target_info, sgx_epid_group_id_t *gid) {
